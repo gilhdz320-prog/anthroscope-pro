@@ -36,6 +36,7 @@ import { GruposPanel } from '@/sections/GruposPanel';
 import { CuadrantesHolway } from '@/sections/CuadrantesHolway';
 import { Avatar3D } from '@/components/three/Avatar3D';
 import { Somatocarta } from '@/components/Somatocarta';
+import { SomatocartaGrupal } from '@/components/SomatocartaGrupal';
 
 function emptyPerfilRestringido(): PerfilRestringido {
   return {
