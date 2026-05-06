@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -39,58 +39,68 @@ function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
   const { estatura = 170, siriPorcentajeGrasa = 15, cincoComponentes, somatotipo, labels } = data;
   const l = labels || { grasa: 'Grasa', musculo: 'Musculo', hueso: 'Hueso', imo: 'IMO', somatotipo: 'Somatotipo' };
 
+  // Escaladores base
   const hScale = estatura / 170;
-  const fatFactor = Math.min(Math.max(siriPorcentajeGrasa / 35, 0.05), 1.3);
-  const muscleFactor = cincoComponentes ? Math.min(Math.max(cincoComponentes.porcentajeMuscular / 45, 0.5), 1.5) : 1;
-  const boneFactor = cincoComponentes ? Math.min(Math.max(cincoComponentes.porcentajeOseo / 8, 0.7), 1.3) : 1;
+
+  // Fat factor: 0 = extremadamente magro, 1 = promedio, 1.5+ = adiposo
+  // Ajustado para que sea visualmente claro
+  const rawFat = siriPorcentajeGrasa;
+  const fatFactor = rawFat <= 6 ? 0.1 : rawFat <= 12 ? 0.3 : rawFat <= 18 ? 0.55 : rawFat <= 25 ? 0.85 : rawFat <= 35 ? 1.15 : 1.5;
+
+  // Muscle factor: 0.5 = poco musculo, 1.0 = promedio, 1.4+ = muy musculoso
+  const rawMuscle = cincoComponentes?.porcentajeMuscular ?? 40;
+  const muscleFactor = rawMuscle <= 30 ? 0.6 : rawMuscle <= 38 ? 0.85 : rawMuscle <= 45 ? 1.05 : rawMuscle <= 52 ? 1.25 : 1.45;
 
   // Somatotipo factors
-  const endo = somatotipo ? somatotipo.endomorfia / 7 : 0.3;
-  const meso = somatotipo ? somatotipo.mesomorfia / 7 : 0.5;
-  const ecto = somatotipo ? somatotipo.ectomorfia / 7 : 0.4;
+  const endo = somatotipo ? Math.min(somatotipo.endomorfia / 7, 1.2) : 0.35;
+  const meso = somatotipo ? Math.min(somatotipo.mesomorfia / 7, 1.2) : 0.55;
+  const ecto = somatotipo ? Math.min(somatotipo.ectomorfia / 7, 1.2) : 0.45;
 
-  // Material definitions
+  // Ancho del torso según somatotipo (meso = ancho, ecto = estrecho, endo = redondeado)
+  const shoulderWidth = 0.38 * hScale * (0.9 + meso * 0.5 + endo * 0.25);
+  const torsoWidth = 0.28 * hScale * (0.85 + endo * 0.4);
+  const waistWidth = 0.16 * hScale * (0.8 + endo * 0.35);
+
+  // Materiales
   const muscleMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color().setHSL(0.58, 0.55, 0.45 + muscleFactor * 0.08),
-    roughness: 0.45,
-    metalness: 0.05,
-  }), [muscleFactor]);
-
-  const boneMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color().setHSL(0.08, 0.15, 0.88),
-    roughness: 0.25,
-    metalness: 0.0,
-    transparent: true,
-    opacity: 0.75,
+    color: new THREE.Color('#4a6fa5'),
+    roughness: 0.4,
+    metalness: 0.15,
   }), []);
 
-  const fatMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color().setHSL(0.11, 0.65, 0.62 + fatFactor * 0.08),
-    roughness: 0.65,
+  const boneMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#e8e0d5'),
+    roughness: 0.3,
     metalness: 0.0,
     transparent: true,
-    opacity: 0.28,
+    opacity: 0.7,
+  }), []);
+
+  // Grasa como capa semi-transparente dorada
+  const fatMat = useMemo(() => new THREE.MeshStandardMaterial({
+    color: new THREE.Color().setHSL(0.12, 0.5, 0.7 + fatFactor * 0.1),
+    roughness: 0.7,
+    metalness: 0.0,
+    transparent: true,
+    opacity: 0.35 + fatFactor * 0.25,
   }), [fatFactor]);
 
   const skinMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color().setHSL(0.07, 0.35, 0.72),
-    roughness: 0.55,
+    color: new THREE.Color('#c4956a'),
+    roughness: 0.5,
     metalness: 0.0,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.25,
   }), []);
 
   const jointMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color().setHSL(0.55, 0.3, 0.35),
-    roughness: 0.6,
-    metalness: 0.1,
+    color: new THREE.Color('#5a6e7c'),
+    roughness: 0.5,
+    metalness: 0.2,
   }), []);
 
-  // Helper to create muscle geometry
-  const createMuscleGroup = () => {
-    const g = new THREE.Group();
-    return g;
-  };
+  // Capsula = forma muscular (cilindro con tapas redondeadas)
+  // Elipse = usando capsule con escalas asimetricas
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -98,241 +108,311 @@ function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
     }
   });
 
+  // Helper: crear un "músculo" (cápsula escalada para parecer real)
+  const Muscle = ({ args, position, rotation = [0, 0, 0], scale = [1, 1, 1], mat = muscleMat }: any) => (
+    <mesh position={position} rotation={rotation} scale={scale} material={mat} castShadow>
+      <capsuleGeometry args={args} />
+    </mesh>
+  );
+
+  // Helper: capa de grasa (envuelve el músculo con escala ligeramente mayor)
+  const FatLayer = ({ args, position, rotation = [0, 0, 0], scaleExtra = 0 }: any) => {
+    const s = 1 + fatFactor * (0.08 + scaleExtra);
+    return (
+      <mesh position={position} rotation={rotation} scale={[s, s * 0.95, s]} material={fatMat}>
+        <capsuleGeometry args={[args[0] * 1.12, args[1] * 1.08, 10, 12]} />
+      </mesh>
+    );
+  };
+
+  // Head
+  const headSize = 0.09 * hScale;
+
   return (
-    <group ref={groupRef} position={[0, -0.9, 0]}>
-      {/* === HEAD === */}
+    <group ref={groupRef} position={[0, -0.95, 0]}>
+
+      {/* ===== HEAD ===== */}
       <group position={[0, 1.58 * hScale, 0]}>
-        {/* Cranium */}
+        {/* Cráneo */}
         <mesh material={boneMat}>
-          <sphereGeometry args={[0.095 * hScale * boneFactor, 24, 24]} />
+          <sphereGeometry args={[headSize, 20, 20]} />
         </mesh>
-        {/* Jaw */}
-        <mesh position={[0, -0.06 * hScale, 0.02 * hScale]} material={boneMat}>
-          <boxGeometry args={[0.11 * hScale, 0.07 * hScale, 0.1 * hScale]} />
+        {/* Mandíbula */}
+        <mesh position={[0, -0.05 * hScale, 0.02 * hScale]} material={jointMat}>
+          <boxGeometry args={[0.1 * hScale, 0.07 * hScale, 0.09 * hScale]} />
         </mesh>
-        {/* Fat layer on face */}
+        {/* Capa grasa facial (afecta la redondez de la cara) */}
         <mesh scale={[1 + fatFactor * 0.12, 1 + fatFactor * 0.08, 1 + fatFactor * 0.1]} material={fatMat}>
-          <sphereGeometry args={[0.098 * hScale, 20, 20]} />
+          <sphereGeometry args={[headSize * 1.05, 16, 16]} />
         </mesh>
       </group>
 
-      {/* === NECK === */}
-      <mesh position={[0, 1.45 * hScale, 0]} material={muscleMat}>
-        <cylinderGeometry args={[0.055 * hScale, 0.065 * hScale, 0.14 * hScale, 16]} />
-      </mesh>
+      {/* ===== NECK ===== */}
+      <group position={[0, 1.48 * hScale, 0]}>
+        <Muscle args={[0.045 * hScale * (0.9 + meso * 0.3), 0.08 * hScale, 12, 16]} scale={[1, 1, 1.2]} />
+      </group>
 
-      {/* === TORSO === */}
-      <group position={[0, 1.15 * hScale, 0]}>
-        {/* Ribcage / Thorax */}
-        <mesh material={boneMat}>
-          <boxGeometry args={[0.32 * hScale, 0.28 * hScale, 0.22 * hScale]} />
+      {/* ===== TORSO ===== */}
+      {/* Tronco superior (caja torácica) - forma de trapecio invertido */}
+      <group position={[0, 1.22 * hScale, 0]}>
+        {/* Costillas/huesos del torso */}
+        <mesh material={boneMat} position={[0, 0, 0]}>
+          <boxGeometry args={[torsoWidth * 0.9, 0.22 * hScale, 0.18 * hScale]} />
         </mesh>
-        
-        {/* Pectorals (chest muscles) */}
+
+        {/* PECTORALES - ahora son planos anchos, NO esferas redondas */}
         <group>
-          <mesh position={[-0.09 * hScale, 0.06 * hScale, 0.11 * hScale * (1 + muscleFactor * 0.3)]} material={muscleMat}>
-            <sphereGeometry args={[0.09 * hScale * muscleFactor, 16, 16]} />
-          </mesh>
-          <mesh position={[0.09 * hScale, 0.06 * hScale, 0.11 * hScale * (1 + muscleFactor * 0.3)]} material={muscleMat}>
-            <sphereGeometry args={[0.09 * hScale * muscleFactor, 16, 16]} />
-          </mesh>
+          <Muscle
+            args={[0.055 * hScale * muscleFactor, 0.02 * hScale, 10, 14]}
+            position={[-0.07 * hScale, 0.04 * hScale, 0.1 * hScale * (0.8 + muscleFactor * 0.25)]}
+            rotation={[0, 0.15, 0.1]}
+            scale={[1.4, 1, 1]}
+          />
+          <Muscle
+            args={[0.055 * hScale * muscleFactor, 0.02 * hScale, 10, 14]}
+            position={[0.07 * hScale, 0.04 * hScale, 0.1 * hScale * (0.8 + muscleFactor * 0.25)]}
+            rotation={[0, -0.15, -0.1]}
+            scale={[1.4, 1, 1]}
+          />
         </group>
 
-        {/* Abdominals (six-pack area) */}
-        {[0, 1, 2].map((row) => (
-          <group key={row}>
-            <mesh position={[-0.04 * hScale, -0.06 * hScale - row * 0.045 * hScale, 0.1 * hScale * (1 + muscleFactor * 0.25)]} material={muscleMat}>
-              <boxGeometry args={[0.07 * hScale * muscleFactor, 0.035 * hScale, 0.02 * hScale]} />
-            </mesh>
-            <mesh position={[0.04 * hScale, -0.06 * hScale - row * 0.045 * hScale, 0.1 * hScale * (1 + muscleFactor * 0.25)]} material={muscleMat}>
-              <boxGeometry args={[0.07 * hScale * muscleFactor, 0.035 * hScale, 0.02 * hScale]} />
-            </mesh>
-          </group>
-        ))}
+        {/* DORSAL ANCHO (espalda) */}
+        <Muscle
+          args={[0.08 * hScale * muscleFactor, 0.03 * hScale, 10, 14]}
+          position={[0, 0.02 * hScale, -0.1 * hScale]}
+          scale={[2.2 * (0.7 + meso * 0.5), 1.2, 0.5]}
+        />
 
-        {/* Obliques */}
-        <mesh position={[-0.16 * hScale, -0.05 * hScale, 0.05 * hScale]} rotation={[0, 0, 0.3]} material={muscleMat}>
-          <boxGeometry args={[0.06 * hScale * muscleFactor, 0.14 * hScale, 0.08 * hScale]} />
-        </mesh>
-        <mesh position={[0.16 * hScale, -0.05 * hScale, 0.05 * hScale]} rotation={[0, 0, -0.3]} material={muscleMat}>
-          <boxGeometry args={[0.06 * hScale * muscleFactor, 0.14 * hScale, 0.08 * hScale]} />
+        {/* TRONCO MEDIO (cintura) - se estrecha */}
+        <group position={[0, -0.1 * hScale, 0]}>
+          {/* Oblicuos */}
+          <Muscle
+            args={[0.04 * hScale * muscleFactor, 0.06 * hScale, 8, 12]}
+            position={[-0.08 * hScale, 0, 0.05 * hScale]}
+            rotation={[0, 0, 0.3]}
+          />
+          <Muscle
+            args={[0.04 * hScale * muscleFactor, 0.06 * hScale, 8, 12]}
+            position={[0.08 * hScale, 0, 0.05 * hScale]}
+            rotation={[0, 0, -0.3]}
+          />
+          {/* Recto abdominal - "six pack" visible solo si baja grasa */}
+          {fatFactor < 0.6 && (
+            <group>
+              {[0, 1, 2].map((row) => (
+                <group key={row}>
+                  <Muscle
+                    args={[0.035 * hScale * muscleFactor, 0.015 * hScale, 8, 10]}
+                    position={[-0.035 * hScale, -0.02 * hScale - row * 0.04 * hScale, 0.08 * hScale]}
+                    scale={[1, 0.8, 0.6]}
+                  />
+                  <Muscle
+                    args={[0.035 * hScale * muscleFactor, 0.015 * hScale, 8, 10]}
+                    position={[0.035 * hScale, -0.02 * hScale - row * 0.04 * hScale, 0.08 * hScale]}
+                    scale={[1, 0.8, 0.6]}
+                  />
+                </group>
+              ))}
+            </group>
+          )}
+        </group>
+
+        {/* CADERA / PELVIS */}
+        <group position={[0, -0.22 * hScale, -0.02 * hScale]}>
+          <mesh material={boneMat}>
+            <boxGeometry args={[waistWidth * 1.3, 0.1 * hScale, 0.14 * hScale]} />
+          </mesh>
+          {/* Glúteos */}
+          <Muscle
+            args={[0.08 * hScale * muscleFactor, 0.04 * hScale, 10, 14]}
+            position={[0, -0.03 * hScale, -0.08 * hScale]}
+            scale={[1.6 * (0.8 + endo * 0.3), 1.1, 0.8]}
+          />
+        </group>
+
+        {/* CAPA DE GRASA DEL TORSO - envuelve todo el torso */}
+        <mesh material={fatMat} position={[0, -0.05 * hScale, 0]}>
+          <boxGeometry args={[torsoWidth * (1 + fatFactor * 0.2), 0.35 * hScale * (1 + fatFactor * 0.12), 0.22 * hScale * (1 + fatFactor * 0.15)]} />
         </mesh>
 
-        {/* Latissimus dorsi (back wings) */}
-        <mesh position={[0, 0.02 * hScale, -0.1 * hScale]} material={muscleMat}>
-          <boxGeometry args={[0.38 * hScale * (1 + meso * 0.4), 0.24 * hScale, 0.06 * hScale]} />
-        </mesh>
-
-        {/* Fat layer on torso */}
-        <mesh scale={[1 + fatFactor * 0.15, 1 + fatFactor * 0.12, 1 + fatFactor * 0.2]} material={fatMat}>
-          <boxGeometry args={[0.34 * hScale, 0.3 * hScale, 0.24 * hScale]} />
-        </mesh>
-
-        {/* Skin layer */}
-        <mesh scale={[1.02, 1.02, 1.02]} material={skinMat}>
-          <boxGeometry args={[0.35 * hScale, 0.32 * hScale, 0.25 * hScale]} />
+        {/* PIEL - capa muy sutil */}
+        <mesh material={skinMat} position={[0, -0.05 * hScale, 0]} scale={[1.02, 1.02, 1.02]}>
+          <boxGeometry args={[torsoWidth * (1 + fatFactor * 0.2), 0.35 * hScale * (1 + fatFactor * 0.12), 0.22 * hScale * (1 + fatFactor * 0.15)]} />
         </mesh>
       </group>
 
-      {/* === SHOULDERS / DELTOIDS === */}
+      {/* ===== SHOULDERS / DELTOIDS ===== */}
       {[-1, 1].map((side) => (
-        <group key={`shoulder-${side}`} position={[side * 0.22 * hScale, 1.28 * hScale, 0]}>
-          <mesh material={muscleMat}>
-            <sphereGeometry args={[0.075 * hScale * muscleFactor, 16, 16]} />
-          </mesh>
-          <mesh position={[side * 0.03 * hScale, 0, 0]} material={fatMat} scale={[1 + fatFactor * 0.1, 1 + fatFactor * 0.1, 1 + fatFactor * 0.1]}>
-            <sphereGeometry args={[0.078 * hScale, 12, 12]} />
-          </mesh>
+        <group key={`delto-${side}`} position={[side * 0.22 * hScale * (0.8 + meso * 0.4), 1.32 * hScale, 0]}>
+          {/* Deltoides frontales */}
+          <Muscle
+            args={[0.05 * hScale * muscleFactor, 0.03 * hScale, 10, 14]}
+            rotation={[0, 0, side * 0.3]}
+            scale={[1.1, 1, 1.3]}
+          />
+          {/* Deltoides laterales - los "hombros" */}
+          <Muscle
+            args={[0.045 * hScale * muscleFactor, 0.02 * hScale, 10, 14]}
+            position={[side * 0.03 * hScale, 0, 0]}
+            rotation={[0, 0, side * -0.2]}
+            scale={[0.8, 1, 1.4]}
+          />
+          {/* Grasa del hombro */}
+          <FatLayer args={[0.055 * hScale, 0.06 * hScale, 10, 12]} position={[0, 0, 0]} />
         </group>
       ))}
 
-      {/* === ARMS === */}
+      {/* ===== ARMS ===== */}
       {[-1, 1].map((side) => (
         <group key={`arm-${side}`}>
-          {/* Upper arm / Bicep */}
-          <group position={[side * 0.26 * hScale, 1.08 * hScale, 0]}>
-            <mesh rotation={[0, 0, side * 0.08]} material={muscleMat}>
-              <capsuleGeometry args={[0.048 * hScale * muscleFactor, 0.16 * hScale, 12, 16]} />
-            </mesh>
-            {/* Bicep peak */}
-            <mesh position={[side * 0.01 * hScale, 0.02 * hScale, 0.04 * hScale]} material={muscleMat}>
-              <sphereGeometry args={[0.04 * hScale * muscleFactor, 12, 12]} />
-            </mesh>
-            {/* Fat on arm */}
-            <mesh rotation={[0, 0, side * 0.08]} scale={[1 + fatFactor * 0.08, 1, 1 + fatFactor * 0.1]} material={fatMat}>
-              <capsuleGeometry args={[0.05 * hScale, 0.155 * hScale, 10, 14]} />
-            </mesh>
-          </group>
-
-          {/* Forearm */}
-          <group position={[side * 0.27 * hScale, 0.88 * hScale, 0]}>
-            <mesh rotation={[0, 0, side * 0.15]} material={muscleMat}>
-              <capsuleGeometry args={[0.035 * hScale * muscleFactor, 0.14 * hScale, 10, 14]} />
-            </mesh>
-            <mesh position={[0, -0.06 * hScale, 0.02 * hScale]} material={muscleMat}>
-              <sphereGeometry args={[0.03 * hScale * muscleFactor, 10, 10]} />
+          {/* Bíceps / Brazo superior */}
+          <group position={[side * 0.28 * hScale * (0.85 + meso * 0.2), 1.08 * hScale, 0]}>
+            <Muscle
+              args={[0.04 * hScale * muscleFactor, 0.14 * hScale, 12, 16]}
+              rotation={[0, 0, side * 0.06]}
+            />
+            {/* Pico del bíceps */}
+            <Muscle
+              args={[0.035 * hScale * muscleFactor, 0.02 * hScale, 10, 12]}
+              position={[0, 0.04 * hScale, 0.02 * hScale]}
+              scale={[1.2, 0.8, 1.1]}
+            />
+            {/* Capa grasa brazo */}
+            <FatLayer args={[0.042 * hScale, 0.13 * hScale, 10, 12]} position={[0, 0, 0]} scaleExtra={0.05} />
+            {/* Hueso (húmero) */}
+            <mesh position={[0, 0, -0.01 * hScale]} material={boneMat}>
+              <capsuleGeometry args={[0.015 * hScale, 0.15 * hScale, 8, 12]} />
             </mesh>
           </group>
 
-          {/* Hand */}
-          <mesh position={[side * 0.28 * hScale, 0.78 * hScale, 0]} material={skinMat}>
-            <boxGeometry args={[0.03 * hScale, 0.04 * hScale, 0.025 * hScale]} />
+          {/* Antebrazo */}
+          <group position={[side * 0.29 * hScale * (0.85 + meso * 0.15), 0.88 * hScale, 0]}>
+            <Muscle
+              args={[0.03 * hScale * muscleFactor, 0.12 * hScale, 10, 14]}
+              rotation={[0, 0, side * 0.12]}
+            />
+            {/* Grasa antebrazo */}
+            <FatLayer args={[0.032 * hScale, 0.11 * hScale, 10, 12]} position={[0, 0, 0]} scaleExtra={0.03} />
+          </group>
+
+          {/* Codo */}
+          <mesh position={[side * 0.28 * hScale, 0.98 * hScale, 0]} material={jointMat}>
+            <sphereGeometry args={[0.03 * hScale, 10, 10]} />
+          </mesh>
+
+          {/* Mano */}
+          <mesh position={[side * 0.29 * hScale, 0.78 * hScale, 0]} material={skinMat}>
+            <boxGeometry args={[0.025 * hScale, 0.035 * hScale, 0.02 * hScale]} />
           </mesh>
         </group>
       ))}
 
-      {/* === HIPS / GLUTES === */}
-      <group position={[0, 0.78 * hScale, -0.03 * hScale]}>
-        <mesh material={muscleMat}>
-          <sphereGeometry args={[0.12 * hScale * (1 + muscleFactor * 0.3) * (1 + endo * 0.3), 16, 16]} />
-        </mesh>
-        <mesh scale={[1 + fatFactor * 0.2, 1 + fatFactor * 0.15, 1 + fatFactor * 0.25]} material={fatMat}>
-          <sphereGeometry args={[0.13 * hScale, 14, 14]} />
-        </mesh>
-      </group>
-
-      {/* === THIGHS / QUADRICEPS === */}
+      {/* ===== THIGHS / QUADRICEPS ===== */}
       {[-1, 1].map((side) => (
         <group key={`thigh-${side}`}>
-          {/* Femur bone */}
-          <mesh position={[side * 0.1 * hScale, 0.5 * hScale, 0]} material={boneMat}>
-            <capsuleGeometry args={[0.025 * hScale * boneFactor, 0.26 * hScale, 8, 14]} />
-          </mesh>
+          <group position={[side * 0.11 * hScale * (0.9 + endo * 0.15), 0.55 * hScale, 0.02 * hScale]}>
+            {/* Fémur (hueso) */}
+            <mesh position={[0, 0, -0.02 * hScale]} material={boneMat}>
+              <capsuleGeometry args={[0.018 * hScale, 0.24 * hScale, 8, 12]} />
+            </mesh>
 
-          {/* Quadriceps - tear drop shape */}
-          <group position={[side * 0.11 * hScale, 0.5 * hScale, 0.04 * hScale]}>
-            <mesh material={muscleMat}>
-              <capsuleGeometry args={[0.065 * hScale * muscleFactor, 0.24 * hScale, 12, 16]} />
-            </mesh>
-            {/* Outer quad sweep */}
-            <mesh position={[side * 0.02 * hScale, 0.06 * hScale, 0]} material={muscleMat}>
-              <sphereGeometry args={[0.055 * hScale * muscleFactor, 12, 12]} />
-            </mesh>
-            {/* Inner quad */}
-            <mesh position={[-side * 0.01 * hScale, -0.02 * hScale, 0.01 * hScale]} material={muscleMat}>
-              <sphereGeometry args={[0.05 * hScale * muscleFactor, 12, 12]} />
+            {/* Cuádriceps - forma de lágrima grande */}
+            <Muscle
+              args={[0.06 * hScale * muscleFactor, 0.22 * hScale, 12, 16]}
+              position={[0, 0.01 * hScale, 0.03 * hScale]}
+              scale={[1.1, 1, 1.2]}
+            />
+            {/* Vasto externo (sweep del cuad) */}
+            <Muscle
+              args={[0.04 * hScale * muscleFactor, 0.02 * hScale, 10, 12]}
+              position={[side * 0.015 * hScale, 0.05 * hScale, 0.01 * hScale]}
+              scale={[1.2, 0.8, 1]}
+            />
+            {/* Isquiotibiales (posterior) */}
+            <Muscle
+              args={[0.045 * hScale * muscleFactor, 0.18 * hScale, 10, 14]}
+              position={[0, 0, -0.04 * hScale]}
+              scale={[1, 1, 0.8]}
+            />
+
+            {/* CAPA GRASA MUSLO - engorda significativamente cuando hay grasa */}
+            <mesh material={fatMat} scale={[1 + fatFactor * 0.18, 1 + fatFactor * 0.08, 1 + fatFactor * 0.22]}>
+              <capsuleGeometry args={[0.065 * hScale, 0.2 * hScale, 12, 16]} />
             </mesh>
           </group>
-
-          {/* Hamstrings (back of thigh) */}
-          <mesh position={[side * 0.1 * hScale, 0.5 * hScale, -0.04 * hScale]} material={muscleMat}>
-            <capsuleGeometry args={[0.05 * hScale * muscleFactor, 0.22 * hScale, 10, 14]} />
-          </mesh>
-
-          {/* Fat on thigh */}
-          <mesh position={[side * 0.11 * hScale, 0.5 * hScale, 0.02 * hScale]} scale={[1 + fatFactor * 0.15, 1, 1 + fatFactor * 0.2]} material={fatMat}>
-            <capsuleGeometry args={[0.068 * hScale, 0.23 * hScale, 10, 14]} />
-          </mesh>
         </group>
       ))}
 
-      {/* === KNEES === */}
+      {/* ===== KNEES ===== */}
       {[-1, 1].map((side) => (
-        <mesh key={`knee-${side}`} position={[side * 0.1 * hScale, 0.34 * hScale, 0]} material={jointMat}>
-          <sphereGeometry args={[0.04 * hScale * boneFactor, 12, 12]} />
+        <mesh key={`knee-${side}`} position={[side * 0.1 * hScale, 0.36 * hScale, 0]} material={jointMat}>
+          <sphereGeometry args={[0.035 * hScale, 12, 12]} />
         </mesh>
       ))}
 
-      {/* === CALVES / GASTROCNEMIUS === */}
+      {/* ===== CALVES / PANTORRILLA ===== */}
       {[-1, 1].map((side) => (
         <group key={`calf-${side}`}>
           <group position={[side * 0.09 * hScale, 0.2 * hScale, 0.015 * hScale]}>
-            <mesh material={muscleMat}>
-              <capsuleGeometry args={[0.042 * hScale * muscleFactor, 0.18 * hScale, 10, 14]} />
-            </mesh>
-            {/* Calf peak (diamond shape) */}
-            <mesh position={[0, 0.04 * hScale, 0.02 * hScale]} material={muscleMat}>
-              <sphereGeometry args={[0.04 * hScale * muscleFactor, 10, 10]} />
-            </mesh>
-            <mesh scale={[1 + fatFactor * 0.1, 1, 1 + fatFactor * 0.12]} material={fatMat}>
-              <capsuleGeometry args={[0.045 * hScale, 0.175 * hScale, 10, 12]} />
+            {/* Gastrocnemio (pantorrilla) */}
+            <Muscle
+              args={[0.038 * hScale * muscleFactor, 0.16 * hScale, 10, 14]}
+              scale={[1, 1, 1.1]}
+            />
+            {/* Pico de la pantorrilla */}
+            <Muscle
+              args={[0.032 * hScale * muscleFactor, 0.02 * hScale, 8, 12]}
+              position={[0, 0.03 * hScale, 0.015 * hScale]}
+              scale={[1.1, 0.8, 1.2]}
+            />
+            {/* Grasa pantorrilla */}
+            <FatLayer args={[0.04 * hScale, 0.15 * hScale, 10, 12]} position={[0, 0, 0]} scaleExtra={0.08} />
+
+            {/* Tibia */}
+            <mesh position={[0, 0, -0.015 * hScale]} material={boneMat}>
+              <capsuleGeometry args={[0.015 * hScale, 0.17 * hScale, 8, 12]} />
             </mesh>
           </group>
 
-          {/* Tibia bone */}
-          <mesh position={[side * 0.08 * hScale, 0.2 * hScale, -0.01 * hScale]} material={boneMat}>
-            <capsuleGeometry args={[0.018 * hScale * boneFactor, 0.19 * hScale, 8, 12]} />
+          {/* Tobillo */}
+          <mesh position={[side * 0.08 * hScale, 0.09 * hScale, 0]} material={jointMat}>
+            <sphereGeometry args={[0.022 * hScale, 10, 10]} />
           </mesh>
 
-          {/* Ankle */}
-          <mesh position={[side * 0.08 * hScale, 0.08 * hScale, 0]} material={jointMat}>
-            <sphereGeometry args={[0.025 * hScale * boneFactor, 10, 10]} />
-          </mesh>
-
-          {/* Foot */}
-          <mesh position={[side * 0.08 * hScale, 0.03 * hScale, 0.03 * hScale]} material={skinMat}>
-            <boxGeometry args={[0.04 * hScale, 0.02 * hScale, 0.09 * hScale]} />
+          {/* Pie */}
+          <mesh position={[side * 0.08 * hScale, 0.04 * hScale, 0.025 * hScale]} material={skinMat}>
+            <boxGeometry args={[0.035 * hScale, 0.015 * hScale, 0.08 * hScale]} />
           </mesh>
         </group>
       ))}
 
-      {/* Labels floating */}
+      {/* ===== LABELS FLOTANTES ===== */}
       {cincoComponentes && (
         <>
-          <Text position={[0.7, 1.5 * hScale, 0]} fontSize={0.055} color="#f59e0b" anchorX="left">
+          <Text position={[0.75, 1.5 * hScale, 0]} fontSize={0.052} color="#f59e0b" anchorX="left">
             {`${l.grasa}: ${cincoComponentes.porcentajeAdiposo.toFixed(1)}%`}
           </Text>
-          <Text position={[0.7, 1.42 * hScale, 0]} fontSize={0.055} color="#3b82f6" anchorX="left">
+          <Text position={[0.75, 1.42 * hScale, 0]} fontSize={0.052} color="#3b82f6" anchorX="left">
             {`${l.musculo}: ${cincoComponentes.porcentajeMuscular.toFixed(1)}%`}
           </Text>
-          <Text position={[0.7, 1.34 * hScale, 0]} fontSize={0.055} color="#8b5cf6" anchorX="left">
+          <Text position={[0.75, 1.34 * hScale, 0]} fontSize={0.052} color="#8b5cf6" anchorX="left">
             {`${l.hueso}: ${cincoComponentes.porcentajeOseo.toFixed(1)}%`}
           </Text>
-          <Text position={[0.7, 1.26 * hScale, 0]} fontSize={0.055} color="#64748b" anchorX="left">
+          <Text position={[0.75, 1.26 * hScale, 0]} fontSize={0.052} color="#64748b" anchorX="left">
             {`${l.imo}: ${(cincoComponentes.masaMuscular / cincoComponentes.masaOsea).toFixed(2)}`}
           </Text>
           {somatotipo && (
-            <Text position={[0.7, 1.18 * hScale, 0]} fontSize={0.05} color="#10b981" anchorX="left">
+            <Text position={[0.75, 1.18 * hScale, 0]} fontSize={0.048} color="#10b981" anchorX="left">
               {`${l.somatotipo}: E${somatotipo.endomorfia}-M${somatotipo.mesomorfia}-Ec${somatotipo.ectomorfia}`}
             </Text>
           )}
         </>
       )}
 
-      {/* Ground plane */}
+      {/* ===== PLANO DEL SUELO ===== */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[3, 3]} />
-        <meshStandardMaterial color="#e2e8f0" transparent opacity={0.25} />
+        <meshStandardMaterial color="#e2e8f0" transparent opacity={0.2} />
       </mesh>
     </group>
   );
@@ -344,6 +424,7 @@ export function Avatar3D(props: Avatar3DProps) {
       fallback={
         <div className="h-[300px] flex flex-col items-center justify-center text-slate-400">
           <p className="text-sm">3D Avatar unavailable</p>
+          <p className="text-xs text-slate-300 mt-1">WebGL may be disabled on this device</p>
         </div>
       }
     >
