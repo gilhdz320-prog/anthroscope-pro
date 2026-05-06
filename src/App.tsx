@@ -35,7 +35,7 @@ import { SaasPanel } from '@/sections/SaasPanel';
 import { GruposPanel } from '@/sections/GruposPanel';
 import { CuadrantesHolway } from '@/sections/CuadrantesHolway';
 import { PotencialGenetico } from '@/sections/PotencialGenetico';
-import { Avatar3D } from '@/components/three/Avatar3D';
+import { Avatar3DLazy } from '@/components/three/Avatar3DLazy';
 import { Somatocarta } from '@/components/Somatocarta';
 import { SomatocartaGrupal } from '@/components/SomatocartaGrupal';
 
@@ -312,22 +312,20 @@ function ISAKApp() {
                       <Dna className="w-5 h-5 text-blue-600" />
                       {t('resultados.avatar3d')}
                     </h3>
-                    <Suspense fallback={<div className="h-[500px] flex items-center justify-center">Cargando avatar 3D...</div>}>
-                      <Avatar3D
-                        estatura={resultado.perfil.estatura}
-                        masaCorporal={resultado.perfil.masaCorporal}
-                        siriPorcentajeGrasa={resultado.siriPorcentajeGrasa || 0}
-                        cincoComponentes={resultado.cincoComponentes}
-                        somatotipo={resultado.somatotipo}
-                        labels={{
-                          grasa: t('avatar.grasa'),
-                          musculo: t('avatar.musculo'),
-                          hueso: t('avatar.hueso'),
-                          imo: t('avatar.imo'),
-                          somatotipo: t('avatar.somatotipo'),
-                        }}
-                      />
-                    </Suspense>
+                    <Avatar3DLazy
+                      estatura={resultado.perfil.estatura}
+                      masaCorporal={resultado.perfil.masaCorporal}
+                      siriPorcentajeGrasa={resultado.siriPorcentajeGrasa || 0}
+                      cincoComponentes={resultado.cincoComponentes}
+                      somatotipo={resultado.somatotipo}
+                      labels={{
+                        grasa: t('avatar.grasa'),
+                        musculo: t('avatar.musculo'),
+                        hueso: t('avatar.hueso'),
+                        imo: t('avatar.imo'),
+                        somatotipo: t('avatar.somatotipo'),
+                      }}
+                    />
                   </Card>
                 )}
 

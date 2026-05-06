@@ -1,9 +1,10 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Environment, MeshDistortMaterial } from '@react-three/drei';
+import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { ErrorBoundary } from './ErrorBoundary';
 
-interface Avatar3DProps {
+export interface Avatar3DProps {
   estatura: number;
   masaCorporal: number;
   siriPorcentajeGrasa: number;
@@ -308,7 +309,7 @@ function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
       {/* Labels floating */}
       {cincoComponentes && (
         <>
-          <Text position={[0.7, 1.5 * hScale, 0]} fontSize={0.055} color="#f59e0b" anchorX="left" font="/Inter-Bold.woff">
+          <Text position={[0.7, 1.5 * hScale, 0]} fontSize={0.055} color="#f59e0b" anchorX="left">
             {`${l.grasa}: ${cincoComponentes.porcentajeAdiposo.toFixed(1)}%`}
           </Text>
           <Text position={[0.7, 1.42 * hScale, 0]} fontSize={0.055} color="#3b82f6" anchorX="left">
@@ -339,24 +340,33 @@ function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
 
 export function Avatar3D(props: Avatar3DProps) {
   return (
-    <div className="w-full h-[500px] rounded-xl overflow-hidden border bg-gradient-to-b from-slate-100 to-slate-200">
-      <Canvas camera={{ position: [0, 0.3, 2.6], fov: 42 }} shadows>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[4, 6, 3]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
-        <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#a5b4fc" />
-        <pointLight position={[0, 2, 0]} intensity={0.3} color="#fcd34d" />
-        <AnatomicalFigure data={props} />
-        <OrbitControls
-          enablePan={false}
-          minDistance={1.8}
-          maxDistance={4.5}
-          minPolarAngle={Math.PI * 0.15}
-          maxPolarAngle={Math.PI * 0.75}
-          autoRotate
-          autoRotateSpeed={0.8}
-        />
-        <Environment preset="studio" />
-      </Canvas>
-    </div>
+    <ErrorBoundary
+      fallback={
+        <div className="h-[300px] flex flex-col items-center justify-center text-slate-400">
+          <p className="text-sm">3D Avatar unavailable</p>
+        </div>
+      }
+    >
+      <div className="w-full h-[500px] rounded-xl overflow-hidden border bg-gradient-to-b from-slate-100 to-slate-200">
+        <Suspense fallback={null}>
+          <Canvas camera={{ position: [0, 0.3, 2.6], fov: 42 }} shadows>
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[4, 6, 3]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
+            <directionalLight position={[-3, 2, -3]} intensity={0.4} color="#a5b4fc" />
+            <pointLight position={[0, 2, 0]} intensity={0.3} color="#fcd34d" />
+            <AnatomicalFigure data={props} />
+            <OrbitControls
+              enablePan={false}
+              minDistance={1.8}
+              maxDistance={4.5}
+              minPolarAngle={Math.PI * 0.15}
+              maxPolarAngle={Math.PI * 0.75}
+              autoRotate
+              autoRotateSpeed={0.8}
+            />
+          </Canvas>
+        </Suspense>
+      </div>
+    </ErrorBoundary>
   );
 }
