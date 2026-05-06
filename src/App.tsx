@@ -319,6 +319,13 @@ function ISAKApp() {
                         siriPorcentajeGrasa={resultado.siriPorcentajeGrasa || 0}
                         cincoComponentes={resultado.cincoComponentes}
                         somatotipo={resultado.somatotipo}
+                        labels={{
+                          grasa: t('avatar.grasa'),
+                          musculo: t('avatar.musculo'),
+                          hueso: t('avatar.hueso'),
+                          imo: t('avatar.imo'),
+                          somatotipo: t('avatar.somatotipo'),
+                        }}
                       />
                     </Suspense>
                   </Card>

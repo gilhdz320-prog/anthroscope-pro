@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, TrendingUp, Dna, Target, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PotencialGeneticoProps {
   masaMuscular: number;
@@ -20,7 +22,6 @@ const LIMITES = {
     imoElite: 5.2,
     imoMaxNatural: 5.5,  // Límite superior natural masculino
     imoDudoso: 5.8,
-    categoria: ['Sedentario', 'Entrenado', 'Atleta', 'Elite Natural', 'Genética excepcional'],
   },
   femenino: {
     imoPromedio: 3.5,
@@ -28,7 +29,6 @@ const LIMITES = {
     imoElite: 4.6,
     imoMaxNatural: 5.1,  // Límite superior natural femenino
     imoDudoso: 5.4,
-    categoria: ['Sedentario', 'Entrenado', 'Atleta', 'Elite Natural', 'Genética excepcional'],
   },
 };
 
@@ -93,7 +93,17 @@ const TABLAS_NORMATIVAS = [
 ];
 
 export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura }: PotencialGeneticoProps) {
+  const { t } = useTranslation();
   const limites = LIMITES[sexo];
+
+  // Categorías traducidas
+  const categorias = [
+    t('genetico.sedentario'),
+    t('genetico.entrenado'),
+    t('genetico.atletaComp'),
+    t('genetico.eliteNatural'),
+    t('genetico.geneticaExc'),
+  ];
 
   // Determinar categoría actual
   let categoriaActual = 0;
@@ -104,24 +114,24 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
     categoriaActual = 4;
     colorCategoria = 'bg-purple-600';
     mensajeGenetico = imo > limites.imoDudoso
-      ? '⚠️ VALOR FUERA DE RANGO DE REFERENCIA: Este IMO excede los límites documentados para atletas naturales. Recomendable revisar técnica de medición o antecedentes.'
-      : '✓ LÍMITE NATURAL MÁXIMO: Has alcanzado el techo genético de masa muscular relativa al esqueleto. Muy pocos atletas en el mundo llegan aquí sin intervención.';
+      ? t('genetico.alertaFuera')
+      : t('genetico.alertaMaximo');
   } else if (imo >= limites.imoElite) {
     categoriaActual = 3;
     colorCategoria = 'bg-emerald-600';
-    mensajeGenetico = 'Genética excepcional / Élite natural. Estás en el top 1% de la población. Tu relación músculo-esqueleto es comparable a atletas olímpicos.';
+    mensajeGenetico = t('genetico.alertaElite');
   } else if (imo >= limites.imoSuperior) {
     categoriaActual = 2;
     colorCategoria = 'bg-blue-500';
-    mensajeGenetico = 'Atleta de alto nivel. Tu potencial muscular es muy bueno. Aún hay margen para mejorar hasta el límite élite.';
+    mensajeGenetico = t('genetico.alertaAtleta');
   } else if (imo >= limites.imoPromedio) {
     categoriaActual = 1;
     colorCategoria = 'bg-amber-500';
-    mensajeGenetico = 'Entrenado activamente. Por encima del promedio poblacional pero con espacio considerable de mejora genética.';
+    mensajeGenetico = t('genetico.alertaEntrenado');
   } else {
     categoriaActual = 0;
     colorCategoria = 'bg-slate-400';
-    mensajeGenetico = 'Por debajo del promedio de referencia. Potencial de mejora muy alto con entrenamiento de fuerza progresivo.';
+    mensajeGenetico = t('genetico.alertaSedentario');
   }
 
   // Calcular potencial remanente
@@ -140,10 +150,10 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
         <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-2">
             <Dna className="w-7 h-7 text-emerald-400" />
-            <h2 className="text-2xl font-bold">Potencial Genético Muscular</h2>
+            <h2 className="text-2xl font-bold">{t('genetico.titulo')}</h2>
           </div>
           <p className="text-slate-400 text-sm">
-            Basado en el Índice Músculo-Óseo (IMO) de Ross & Kerr. Límites naturales según Holway et al.
+            {t('genetico.subtitulo')}
           </p>
         </CardContent>
       </Card>
@@ -152,30 +162,30 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className={`${colorCategoria} text-white`}>
           <CardContent className="pt-6 text-center">
-            <p className="text-xs uppercase tracking-wider opacity-80 mb-1">IMO Actual</p>
+            <p className="text-xs uppercase tracking-wider opacity-80 mb-1">{t('genetico.imoActual')}</p>
             <p className="text-4xl font-bold">{imo.toFixed(2)}</p>
-            <p className="text-xs opacity-80 mt-1">{limites.categoria[categoriaActual]}</p>
+            <p className="text-xs opacity-80 mt-1">{categorias[categoriaActual]}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-xs text-slate-500 uppercase mb-1">Límite Natural</p>
+            <p className="text-xs text-slate-500 uppercase mb-1">{t('genetico.limiteNatural')}</p>
             <p className="text-3xl font-bold text-slate-800">{limites.imoMaxNatural}</p>
-            <p className="text-xs text-slate-400">Techo genético {sexo === 'masculino' ? 'masculino' : 'femenino'}</p>
+            <p className="text-xs text-slate-400">{sexo === 'masculino' ? 'Male' : 'Female'} limit</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-xs text-slate-500 uppercase mb-1">Potencial Remanente</p>
+            <p className="text-xs text-slate-500 uppercase mb-1">{t('genetico.potencialRemanente')}</p>
             <p className="text-3xl font-bold text-emerald-700">
               {potencialRemanente > 0 ? `+${potencialRemanente.toFixed(1)}` : `${potencialRemanente.toFixed(1)}`}
             </p>
-            <p className="text-xs text-slate-400">kg de músculo posible</p>
+            <p className="text-xs text-slate-400">{t('genetico.potencialKg')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-xs text-slate-500 uppercase mb-1">% del Techo</p>
+            <p className="text-xs text-slate-500 uppercase mb-1">{t('genetico.porcTecho')}</p>
             <p className="text-3xl font-bold text-blue-700">{porcentajeAlcanzado.toFixed(0)}%</p>
             <Progress value={porcentajeAlcanzado} max={100} className="mt-2 h-2" />
           </CardContent>
@@ -203,21 +213,21 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <TrendingUp className="w-5 h-5 text-emerald-600" />
-            Escala de Índice Músculo-Óseo (IMO)
+            {t('genetico.escala')}
           </CardTitle>
           <p className="text-xs text-slate-500">
-            Sexo: {sexo === 'masculino' ? 'Masculino' : 'Femenino'} | 
-            Tu IMO: <span className="font-bold">{imo.toFixed(2)}</span>
+            {sexo === 'masculino' ? 'Male' : 'Female'} | 
+            IMO: <span className="font-bold">{imo.toFixed(2)}</span>
           </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[
-              { label: 'Sedentario / Promedio', min: 0, max: limites.imoPromedio, color: 'bg-slate-300', desc: 'Sin entrenamiento sistemático de fuerza' },
-              { label: 'Entrenado activo', min: limites.imoPromedio, max: limites.imoSuperior, color: 'bg-amber-400', desc: '1-3 años de entrenamiento de fuerza' },
-              { label: 'Atleta de competición', min: limites.imoSuperior, max: limites.imoElite, color: 'bg-blue-400', desc: 'Atleta de élite deportivo' },
-              { label: 'Élite natural', min: limites.imoElite, max: limites.imoMaxNatural, color: 'bg-emerald-500', desc: 'Top 1% genético + entrenamiento óptimo' },
-              { label: 'Genética excepcional / Revisar', min: limites.imoMaxNatural, max: limites.imoDudoso, color: 'bg-purple-500', desc: 'Límite natural máximo documentado' },
+              { label: t('genetico.sedentario'), min: 0, max: limites.imoPromedio, color: 'bg-slate-300', desc: t('genetico.descSed') },
+              { label: t('genetico.entrenado'), min: limites.imoPromedio, max: limites.imoSuperior, color: 'bg-amber-400', desc: t('genetico.descEnt') },
+              { label: t('genetico.atletaComp'), min: limites.imoSuperior, max: limites.imoElite, color: 'bg-blue-400', desc: t('genetico.descAtl') },
+              { label: t('genetico.eliteNatural'), min: limites.imoElite, max: limites.imoMaxNatural, color: 'bg-emerald-500', desc: t('genetico.descEli') },
+              { label: t('genetico.geneticaExc'), min: limites.imoMaxNatural, max: limites.imoDudoso, color: 'bg-purple-500', desc: t('genetico.descGen') },
             ].map((rango, i) => {
               const activo = imo >= rango.min && imo < rango.max;
               const pasado = imo >= rango.max;
@@ -234,8 +244,8 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1">{rango.desc}</p>
                   </div>
-                  {activo && <Badge className="bg-emerald-500 text-white shrink-0">TÚ</Badge>}
-                  {pasado && i === 4 && <Badge className="bg-purple-500 text-white shrink-0">TÚ</Badge>}
+                  {activo && <Badge className="bg-emerald-500 text-white shrink-0">{imo >= limites.imoMaxNatural ? 'MAX' : 'YOU'}</Badge>}
+                  {pasado && i === 4 && <Badge className="bg-purple-500 text-white shrink-0">YOU</Badge>}
                 </div>
               );
             })}
@@ -248,7 +258,7 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Target className="w-5 h-5 text-blue-600" />
-            Tablas Normativas por Deporte y Posición
+            {t('genetico.tablasTitulo')}
           </CardTitle>
           <div className="flex gap-2 mt-2 flex-wrap">
             {TABLAS_NORMATIVAS.map((t, i) => (
@@ -264,12 +274,12 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-xs text-slate-500">
-                  <th className="text-left py-2 px-3">Posición / Categoría</th>
-                  <th className="text-center py-2 px-3">IMO Mín</th>
-                  <th className="text-center py-2 px-3">IMO Máx</th>
-                  <th className="text-center py-2 px-3">% Grasa Mín</th>
-                  <th className="text-center py-2 px-3">% Grasa Máx</th>
-                  <th className="text-center py-2 px-3">Tu IMO</th>
+                  <th className="text-left py-2 px-3">{t('genetico.posicion')}</th>
+                  <th className="text-center py-2 px-3">{t('genetico.imoMin')}</th>
+                  <th className="text-center py-2 px-3">{t('genetico.imoMax')}</th>
+                  <th className="text-center py-2 px-3">{t('genetico.grasaMin')}</th>
+                  <th className="text-center py-2 px-3">{t('genetico.grasaMax')}</th>
+                  <th className="text-center py-2 px-3">{t('genetico.tuIMO')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,11 +294,11 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
                       <td className="text-center py-2 px-3">{pos.grasaMax}%</td>
                       <td className="text-center py-2 px-3">
                         {enRango ? (
-                          <Badge className="bg-emerald-500 text-white text-xs">✓ EN RANGO</Badge>
+                          <Badge className="bg-emerald-500 text-white text-xs">{t('genetico.enRango')}</Badge>
                         ) : imo < pos.imoMin ? (
-                          <span className="text-amber-600 text-xs">Por debajo</span>
+                          <span className="text-amber-600 text-xs">{t('genetico.porDebajo')}</span>
                         ) : (
-                          <span className="text-purple-600 text-xs">Por encima</span>
+                          <span className="text-purple-600 text-xs">{t('genetico.porEncima')}</span>
                         )}
                       </td>
                     </tr>
@@ -298,7 +308,7 @@ export function PotencialGenetico({ masaMuscular, masaOsea, imo, sexo, estatura 
             </table>
           </div>
           <p className="text-xs text-slate-400 mt-3">
-            Fuentes: Holway & Barrios (2012), Ross et al. (1999), Carter & Ackland (1994), datos de selecciones nacionales.
+            {t('genetico.fuentes')}
           </p>
         </CardContent>
       </Card>

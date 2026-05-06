@@ -23,12 +23,20 @@ interface Avatar3DProps {
     mesomorfia: number;
     ectomorfia: number;
   };
+  labels?: {
+    grasa: string;
+    musculo: string;
+    hueso: string;
+    imo: string;
+    somatotipo: string;
+  };
 }
 
 function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
   const groupRef = useRef<THREE.Group>(null);
 
-  const { estatura = 170, siriPorcentajeGrasa = 15, cincoComponentes, somatotipo } = data;
+  const { estatura = 170, siriPorcentajeGrasa = 15, cincoComponentes, somatotipo, labels } = data;
+  const l = labels || { grasa: 'Grasa', musculo: 'Musculo', hueso: 'Hueso', imo: 'IMO', somatotipo: 'Somatotipo' };
 
   const hScale = estatura / 170;
   const fatFactor = Math.min(Math.max(siriPorcentajeGrasa / 35, 0.05), 1.3);
@@ -301,20 +309,20 @@ function AnatomicalFigure({ data }: { data: Avatar3DProps }) {
       {cincoComponentes && (
         <>
           <Text position={[0.7, 1.5 * hScale, 0]} fontSize={0.055} color="#f59e0b" anchorX="left" font="/Inter-Bold.woff">
-            {`Grasa: ${cincoComponentes.porcentajeAdiposo.toFixed(1)}%`}
+            {`${l.grasa}: ${cincoComponentes.porcentajeAdiposo.toFixed(1)}%`}
           </Text>
           <Text position={[0.7, 1.42 * hScale, 0]} fontSize={0.055} color="#3b82f6" anchorX="left">
-            {`Músculo: ${cincoComponentes.porcentajeMuscular.toFixed(1)}%`}
+            {`${l.musculo}: ${cincoComponentes.porcentajeMuscular.toFixed(1)}%`}
           </Text>
           <Text position={[0.7, 1.34 * hScale, 0]} fontSize={0.055} color="#8b5cf6" anchorX="left">
-            {`Hueso: ${cincoComponentes.porcentajeOseo.toFixed(1)}%`}
+            {`${l.hueso}: ${cincoComponentes.porcentajeOseo.toFixed(1)}%`}
           </Text>
           <Text position={[0.7, 1.26 * hScale, 0]} fontSize={0.055} color="#64748b" anchorX="left">
-            {`IMO: ${(cincoComponentes.masaMuscular / cincoComponentes.masaOsea).toFixed(2)}`}
+            {`${l.imo}: ${(cincoComponentes.masaMuscular / cincoComponentes.masaOsea).toFixed(2)}`}
           </Text>
           {somatotipo && (
             <Text position={[0.7, 1.18 * hScale, 0]} fontSize={0.05} color="#10b981" anchorX="left">
-              {`Somatotipo: E${somatotipo.endomorfia}-M${somatotipo.mesomorfia}-Ec${somatotipo.ectomorfia}`}
+              {`${l.somatotipo}: E${somatotipo.endomorfia}-M${somatotipo.mesomorfia}-Ec${somatotipo.ectomorfia}`}
             </Text>
           )}
         </>

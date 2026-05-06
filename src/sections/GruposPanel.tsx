@@ -126,9 +126,9 @@ export function GruposPanel() {
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-amber-400" />
-                Club de Futbol Profesional
+                {t('grupos.equipo')}
               </h2>
-              <p className="text-slate-400 text-sm mt-1">20 atletas evaluados | Fecha: {new Date().toLocaleDateString()}</p>
+              <p className="text-slate-400 text-sm mt-1">{atletas.length} athletes | {new Date().toLocaleDateString()}</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="border-slate-600 text-white hover:bg-slate-700" onClick={handleExportExcel}>
@@ -148,26 +148,26 @@ export function GruposPanel() {
           <CardContent className="pt-6 text-center">
             <Target className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
             <p className="text-3xl font-bold text-emerald-800">{optimos}</p>
-            <p className="text-xs text-emerald-600 font-medium">En zona optima</p>
+            <p className="text-xs text-emerald-600 font-medium">{t('grupos.optimo')}</p>
           </CardContent>
         </Card>
         <Card className="bg-amber-50 border-amber-200">
           <CardContent className="pt-6 text-center">
             <TrendingUp className="w-6 h-6 text-amber-600 mx-auto mb-2" />
             <p className="text-3xl font-bold text-amber-800">{atencion}</p>
-            <p className="text-xs text-amber-600 font-medium">Requieren atencion</p>
+            <p className="text-xs text-amber-600 font-medium">{t('grupos.atencion')}</p>
           </CardContent>
         </Card>
         <Card className="bg-red-50 border-red-200">
           <CardContent className="pt-6 text-center">
             <Users className="w-6 h-6 text-red-600 mx-auto mb-2" />
             <p className="text-3xl font-bold text-red-800">{intervencion}</p>
-            <p className="text-xs text-red-600 font-medium">Intervencion prioritaria</p>
+            <p className="text-xs text-red-600 font-medium">{t('grupos.intervencion')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6 text-center">
-            <p className="text-xs text-slate-500">Grasa promedio equipo</p>
+            <p className="text-xs text-slate-500">{t('grupos.grasaProm')}</p>
             <p className="text-3xl font-bold">{promedioGrasa.toFixed(1)}%</p>
             <p className="text-xs text-slate-400">IMO: {promedioIMO.toFixed(2)}</p>
           </CardContent>
@@ -176,10 +176,10 @@ export function GruposPanel() {
 
       <Tabs defaultValue="lista" className="space-y-4">
         <TabsList className="bg-white border">
-          <TabsTrigger value="lista" className="flex items-center gap-1"><Users className="w-4 h-4" /> Lista</TabsTrigger>
+          <TabsTrigger value="lista" className="flex items-center gap-1"><Users className="w-4 h-4" /> {t('grupos.listaAtletas')}</TabsTrigger>
           <TabsTrigger value="somatocarta" className="flex items-center gap-1"><Target className="w-4 h-4" /> Somatocarta</TabsTrigger>
-          <TabsTrigger value="cuadrantes" className="flex items-center gap-1"><TrendingUp className="w-4 h-4" /> Cuadrantes</TabsTrigger>
-          <TabsTrigger value="comparacion" className="flex items-center gap-1"><Trophy className="w-4 h-4" /> Comparacion Global</TabsTrigger>
+          <TabsTrigger value="cuadrantes" className="flex items-center gap-1"><TrendingUp className="w-4 h-4" /> {t('cuadrantes.titulo')}</TabsTrigger>
+          <TabsTrigger value="comparacion" className="flex items-center gap-1"><Trophy className="w-4 h-4" /> {t('grupos.comparacionGlobal')}</TabsTrigger>
         </TabsList>
 
         {/* TAB: LISTA DE ATLETAS */}
@@ -191,19 +191,19 @@ export function GruposPanel() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos los atletas</SelectItem>
-                  <SelectItem value="optimo">Solo optimos</SelectItem>
-                  <SelectItem value="atencion">Requieren atencion</SelectItem>
-                  <SelectItem value="intervencion">Intervencion prioritaria</SelectItem>
+                  <SelectItem value="todos">{t('grupos.todos')}</SelectItem>
+                  <SelectItem value="optimo">{t('grupos.soloOptimos')}</SelectItem>
+                  <SelectItem value="atencion">{t('grupos.atencion')}</SelectItem>
+                  <SelectItem value="intervencion">{t('grupos.intervencion')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="sm"><UserPlus className="w-4 h-4 mr-1" /> Agregar atleta</Button>
+                <Button size="sm"><UserPlus className="w-4 h-4 mr-1" /> {t('grupos.agregar')}</Button>
               </DialogTrigger>
               <DialogContent className="max-w-lg">
-                <DialogHeader><DialogTitle>Agregar atleta al equipo</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle>{t('grupos.agregar')}</DialogTitle></DialogHeader>
                 <AgregarAtletaForm onAdd={agregarAtleta} />
               </DialogContent>
             </Dialog>
@@ -214,15 +214,15 @@ export function GruposPanel() {
               <TableHeader>
                 <TableRow className="bg-slate-50">
                   <TableHead className="w-10">#</TableHead>
-                  <TableHead>Atleta</TableHead>
-                  <TableHead>Pos.</TableHead>
+                  <TableHead>{t('grupos.atleta')}</TableHead>
+                  <TableHead>{t('grupos.pos')}</TableHead>
                   <TableHead>IMC</TableHead>
                   <TableHead>% Grasa</TableHead>
                   <TableHead>Musc. (kg)</TableHead>
                   <TableHead>IMO</TableHead>
                   <TableHead>Somatotipo</TableHead>
                   <TableHead>Cuadrante</TableHead>
-                  <TableHead className="text-right">Accion</TableHead>
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -231,7 +231,7 @@ export function GruposPanel() {
                     <TableCell className="font-mono text-xs">{a.id}</TableCell>
                     <TableCell>
                       <div className="font-medium">{a.nombre}</div>
-                      <div className="text-xs text-slate-400">{a.edad} anos | {a.estatura}cm | {a.masa}kg</div>
+                      <div className="text-xs text-slate-400">{a.edad} {t('grupos.anos')} | {a.estatura}cm | {a.masa}kg</div>
                     </TableCell>
                     <TableCell>{a.posicion}</TableCell>
                     <TableCell>{a.imc.toFixed(1)}</TableCell>
@@ -288,7 +288,7 @@ export function GruposPanel() {
                   porcentajeGrasa={selectedAtleta.porcentajeGrasa}
                 />
                 <Card className="p-6">
-                  <h4 className="font-bold mb-4">Distribucion del equipo en cuadrantes</h4>
+                  <h4 className="font-bold mb-4">{t('grupos.distribucion')}</h4>
                   <div className="space-y-3">
                     {['Muscle High / Fat Low', 'Optimal Zone', 'Muscle Low / Fat Low', 'Muscle High / Fat High', 'Neutral Zone', 'Muscle Low / Fat High'].map((cuad, i) => {
                       const count = atletas.filter(a => a.cuadrante === cuad).length;
@@ -308,7 +308,7 @@ export function GruposPanel() {
               </>
             ) : (
               <Card className="col-span-2 p-12 text-center text-slate-400">
-                <p>Selecciona un atleta de la lista para ver sus cuadrantes</p>
+                <p>{t('grupos.seleccionarRef')}</p>
               </Card>
             )}
           </div>
@@ -320,7 +320,7 @@ export function GruposPanel() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-indigo-600" />
-                Comparacion con referencias globales
+                {t('grupos.comparacionGlobal')}
               </CardTitle>
               <div className="flex gap-2 mt-2">
                 <Select value={refSeleccionada} onValueChange={setRefSeleccionada}>
@@ -351,17 +351,17 @@ export function GruposPanel() {
                 </div>
 
                 <div className="p-4 border rounded-lg">
-                  <h4 className="font-bold text-slate-800 mb-2">Tu equipo vs {ref.codigo}</h4>
+                  <h4 className="font-bold text-slate-800 mb-2">Team vs {ref.codigo}</h4>
                   <div className="space-y-4">
                     <ComparadorBarra label="% Grasa" tuValor={promedioGrasa} refValor={ref.grasa} unidad="%" invertido={false} />
                     <ComparadorBarra label="IMO" tuValor={promedioIMO} refValor={ref.imo} unidad="" invertido={true} />
                     <ComparadorBarra label="Estatura" tuValor={atletas.reduce((a,b) => a + b.estatura, 0) / atletas.length} refValor={ref.estatura} unidad="cm" invertido={false} />
                   </div>
                   <div className="mt-4 p-3 bg-amber-50 rounded-lg text-sm">
-                    <p className="font-semibold text-amber-800">Interpretacion:</p>
+                    <p className="font-semibold text-amber-800">{t('resultados.interpretacion')}:</p>
                     <p className="text-amber-700">
-                      {promedioGrasa < ref.grasa ? 'Tu equipo tiene menos grasa que la referencia. ' : 'Tu equipo tiene mas grasa que la referencia. '}
-                      {promedioIMO > ref.imo ? 'Mayor relacion musculo/hueso (mas potencia).' : 'Menor relacion musculo/hueso.'}
+                      {promedioGrasa < ref.grasa ? 'Lower body fat vs reference. ' : 'Higher body fat vs reference. '}
+                      {promedioIMO > ref.imo ? 'Higher muscle/bone ratio (more power).' : 'Lower muscle/bone ratio.'}
                     </p>
                   </div>
                 </div>
@@ -426,21 +426,21 @@ export function GruposPanel() {
                     selectedAtleta.estado === 'optimo' ? 'bg-emerald-500' :
                     selectedAtleta.estado === 'atencion' ? 'bg-amber-500' : 'bg-red-500'
                   }>
-                    {selectedAtleta.estado === 'optimo' ? 'Optimo' : selectedAtleta.estado === 'atencion' ? 'Atencion' : 'Intervencion'}
+                    {selectedAtleta.estado === 'optimo' ? t('grupos.optimo') : selectedAtleta.estado === 'atencion' ? t('grupos.atencion') : t('grupos.intervencion')}
                   </Badge>
                 </DialogTitle>
               </DialogHeader>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Edad:</span> <span className="font-semibold">{selectedAtleta.edad} anos</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Posicion:</span> <span className="font-semibold">{selectedAtleta.posicion}</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Estatura:</span> <span className="font-semibold">{selectedAtleta.estatura}cm</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Masa:</span> <span className="font-semibold">{selectedAtleta.masa}kg</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('sujeto.fechaNacimiento')}:</span> <span className="font-semibold">{selectedAtleta.edad} {t('grupos.anos')}</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('grupos.pos')}:</span> <span className="font-semibold">{selectedAtleta.posicion}</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('mediciones.estatura')}:</span> <span className="font-semibold">{selectedAtleta.estatura}cm</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('mediciones.masaCorporal')}:</span> <span className="font-semibold">{selectedAtleta.masa}kg</span></div>
                 <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">IMC:</span> <span className="font-semibold">{selectedAtleta.imc}</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">% Grasa:</span> <span className="font-semibold">{selectedAtleta.porcentajeGrasa}%</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Masa Muscular:</span> <span className="font-semibold">{selectedAtleta.masaMuscular}kg</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">% Fat:</span> <span className="font-semibold">{selectedAtleta.porcentajeGrasa}%</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('resultados.masaMuscular')}:</span> <span className="font-semibold">{selectedAtleta.masaMuscular}kg</span></div>
                 <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">IMO:</span> <span className="font-semibold">{selectedAtleta.imo}</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Somatotipo:</span> <span className="font-semibold">{selectedAtleta.somatotipo}</span></div>
-                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">Cuadrante:</span> <span className="font-semibold">{selectedAtleta.cuadrante}</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('resultados.somatotipo')}:</span> <span className="font-semibold">{selectedAtleta.somatotipo}</span></div>
+                <div className="p-3 bg-slate-50 rounded"><span className="text-slate-500">{t('cuadrantes.titulo')}:</span> <span className="font-semibold">{selectedAtleta.cuadrante}</span></div>
               </div>
               <div className="mt-4">
                 <CuadrantesHolway
@@ -451,8 +451,8 @@ export function GruposPanel() {
                 />
               </div>
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" className="flex-1"><Printer className="w-4 h-4 mr-2" /> Imprimir ficha</Button>
-                <Button variant="outline" className="flex-1"><FileSpreadsheet className="w-4 h-4 mr-2" /> Exportar ficha</Button>
+                <Button variant="outline" className="flex-1"><Printer className="w-4 h-4 mr-2" /> {t('grupos.imprimirFicha')}</Button>
+                <Button variant="outline" className="flex-1"><FileSpreadsheet className="w-4 h-4 mr-2" /> {t('grupos.exportarFicha')}</Button>
               </div>
             </>
           )}

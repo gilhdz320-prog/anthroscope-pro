@@ -27,30 +27,30 @@ export function CuadrantesHolway({ masaMuscular, masaGrasa, imo, porcentajeGrasa
 
   if (porcentajeGrasa <= umbralGrasaBaja && masaMuscular >= umbralMusculoAlto) {
     cuadrante = t('cuadrantes.musculoAltoGrasaBaja') || 'MÚSCULO ALTO + GRASA BAJA';
-    descripcion = 'Atleta con masa muscular desarrollada y mínima adiposidad. Ideal para fuerza, potencia y velocidad. El perfil de élite.';
+    descripcion = t('cuadrantes.descMHGL');
     color = 'bg-emerald-100 text-emerald-800 border-emerald-300';
-    recomendacion = 'Mantener composición. En periodos de competencia, vigilar que la grasa no descienda peligrosamente (<6% hombres, <12% mujeres).';
+    recomendacion = t('cuadrantes.recMHGL');
   } else if (porcentajeGrasa <= umbralGrasaBaja && masaMuscular < umbralMusculoAlto) {
     cuadrante = t('cuadrantes.musculoBajoGrasaBaja') || 'MÚSCULO BAJO + GRASA BAJA';
-    descripcion = 'Atleta delgado con poca masa muscular. Común en deportes de resistencia. Riesgo de pérdida de fuerza y lesiones.';
+    descripcion = t('cuadrantes.descMBGL');
     color = 'bg-amber-100 text-amber-800 border-amber-300';
-    recomendacion = 'Prioridad: aumentar masa muscular mediante entrenamiento de fuerza progresivo e hipercalórica moderada.';
+    recomendacion = t('cuadrantes.recMBGL');
   } else if (porcentajeGrasa > umbralGrasaAlta && masaMuscular >= umbralMusculoAlto) {
     cuadrante = t('cuadrantes.musculoAltoGrasaAlta') || 'MÚSCULO ALTO + GRASA ALTA';
-    descripcion = 'Atleta fuerte pero con exceso de adiposidad. Potencial de fuerza subutilizado por peso extra. Común en línea/levantadores pesados.';
+    descripcion = t('cuadrantes.descMHGH');
     color = 'bg-orange-100 text-orange-800 border-orange-300';
-    recomendacion = 'Reducir grasa corporal mediante déficit calórico controlado manteniendo proteína alta (2g/kg). Preservar entrenamiento de fuerza.';
+    recomendacion = t('cuadrantes.recMHGH');
   } else if (porcentajeGrasa > umbralGrasaAlta && masaMuscular < umbralMusculoAlto) {
     cuadrante = t('cuadrantes.musculoBajoGrasaAlta') || 'MÚSCULO BAJO + GRASA ALTA';
-    descripcion = 'Bajo rendimiento deportivo. Masa muscular insuficiente y adiposidad elevada. Mayor riesgo metabólico y de lesión.';
+    descripcion = t('cuadrantes.descMBGH');
     color = 'bg-red-100 text-red-800 border-red-300';
-    recomendacion = 'Intervención prioritaria. Programa integral: fuerza + nutrición estructurada. Considerar apoyo de nutriólogo deportivo.';
+    recomendacion = t('cuadrantes.recMBGH');
   } else {
     // Zona intermedia (óptimo/óptimo)
-    cuadrante = t('cuadrantes.optimoOptimizado') || 'COMPOSICIÓN ÓPTIMA';
-    descripcion = 'Equilibrio entre masa muscular y grasa. Zona saludable y funcional para la mayoría de deportes.';
+    cuadrante = t('cuadrantes.optimo') || 'COMPOSICIÓN ÓPTIMA';
+    descripcion = t('cuadrantes.descOpt');
     color = 'bg-blue-100 text-blue-800 border-blue-300';
-    recomendacion = 'Mantener rutina actual. Ajustar según periodización del deporte (hipertrofía en pretemporada, mantenimiento en competencia).';
+    recomendacion = t('cuadrantes.recOpt');
   }
 
   return (
@@ -61,7 +61,7 @@ export function CuadrantesHolway({ masaMuscular, masaGrasa, imo, porcentajeGrasa
           <p className="text-sm opacity-80 leading-relaxed">{descripcion}</p>
         </div>
         <div className="bg-slate-50 p-6 rounded-xl border">
-          <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-2">Recomendación específica</h4>
+          <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-2">{t('cuadrantes.recomendacion')}</h4>
           <p className="text-sm text-slate-600 leading-relaxed">{recomendacion}</p>
         </div>
       </div>
