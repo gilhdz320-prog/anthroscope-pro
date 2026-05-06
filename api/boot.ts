@@ -11,22 +11,24 @@ import { getDb } from "./queries/connection";
 import { suscripciones, pagos, planes } from "@db/schema";
 import { eq } from "drizzle-orm";
 
-// Auto-sync database on startup (for Railway deployment)
-async function autoSyncDb() {
+const app = new Hono<{ Bindings: HttpBindings }>();
+
+// Healthcheck endpoint - Railway pings this to verify the service is alive
+app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
+
+// Auto-sync database on startup (delayed so server starts first)
+setTimeout(async () => {
   try {
     const { execSync } = await import('child_process');
     console.log('[DB] Syncing schema...');
-    execSync('npm run db:push', { stdio: 'inherit' });
+    execSync('npm run db:push', { stdio: 'inherit', timeout: 30000 });
     console.log('[DB] Seeding plans...');
-    execSync('npx tsx db/seed.ts', { stdio: 'inherit' });
+    execSync('npx tsx db/seed.ts', { stdio: 'inherit', timeout: 30000 });
     console.log('[DB] Done!');
   } catch (e) {
-    console.log('[DB] Skipping auto-sync (already synced or offline)');
+    console.log('[DB] Skipping auto-sync:', (e as Error).message);
   }
-}
-autoSyncDb();
-
-const app = new Hono<{ Bindings: HttpBindings }>();
+}, 5000);
 
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
@@ -114,4 +116,3 @@ if (env.isProduction) {
     console.log(`Server running on http://localhost:${port}/`);
   });
 }
-// Force redeploy Wed May  6 15:28:56 CST 2026
