@@ -211,8 +211,15 @@ function ISAKApp() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {user && <span className="text-sm text-emerald-400 hidden md:inline">{user.name || user.email}</span>}
-            {user && <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white" onClick={logout}>Salir</Button>}
+            <a href="/login" className="inline-flex items-center gap-1 px-3 py-1.5 text-sm border border-emerald-500 text-emerald-400 rounded-md hover:bg-emerald-900 hover:text-emerald-200 transition-colors">
+              <User className="w-4 h-4" /> Login
+            </a>
+            {user && (
+              <>
+                <span className="text-sm text-emerald-400 hidden md:inline">{user.name || user.email}</span>
+                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white" onClick={logout}>Salir</Button>
+              </>
+            )}
             <Button variant="outline" size="sm" className="border-amber-400 text-amber-300 hover:bg-amber-900 hover:text-amber-200 hidden md:flex"
               onClick={cargarDemoNivel4}>
               <Sparkles className="w-4 h-4 mr-1" /> Demo Nivel 4

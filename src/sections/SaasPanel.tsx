@@ -15,6 +15,11 @@ export function SaasPanel() {
     { userId: user?.id ?? 0 },
     { enabled: !!user?.id }
   );
+  const createCheckout = trpc.stripe.createCheckoutSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) window.location.href = data.url;
+    },
+  });
 
   const formatPrice = (price: string, period: string) => {
     return `$${price} USD${period === 'mes' ? '/mes' : '/año'}`;
@@ -133,13 +138,23 @@ export function SaasPanel() {
                     className={`w-full mt-6 ${
                       isInstitution ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700'
                     }`}
+                    disabled={!user || createCheckout.isPending}
                     onClick={() => {
-                      // Stripe checkout simulation - in production this would redirect to Stripe
-                      window.open(`https://buy.stripe.com/test?plan=${plan.codigo}`, '_blank');
+                      if (!user) {
+                        window.location.href = '/login';
+                        return;
+                      }
+                      createCheckout.mutate({
+                        planId: plan.id,
+                        userId: user.id,
+                        periodo: 'mensual',
+                        successUrl: `${window.location.origin}/?paid=success`,
+                        cancelUrl: `${window.location.origin}/?paid=cancel`,
+                      });
                     }}
                   >
                     <CreditCard className="w-4 h-4 mr-2" /> 
-                    {isInstitution ? 'Contactar Ventas' : 'Suscribirse'}
+                    {!user ? 'Inicia Sesion para Suscribirte' : isInstitution ? 'Contactar Ventas' : 'Suscribirse'}
                   </Button>
                 </CardContent>
               </Card>
