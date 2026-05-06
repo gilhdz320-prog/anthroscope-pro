@@ -1,4 +1,4 @@
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback } from 'react';
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route } from 'react-router';
@@ -12,7 +12,7 @@ import {
   User, Ruler, Activity, FileText, BarChart3, Save,
   Download, RotateCcw, ChevronRight, Dna, Calculator,
   ShieldCheck, Globe, History, CreditCard, Printer,
-  Sparkles, FileSpreadsheet, Users, DnaIcon, Brain,
+  Sparkles, FileSpreadsheet, Users, Brain,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -38,6 +38,7 @@ import { PotencialGenetico } from '@/sections/PotencialGenetico';
 import { Avatar3DLazy } from '@/components/three/Avatar3DLazy';
 import { Somatocarta } from '@/components/Somatocarta';
 import { SomatocartaGrupal } from '@/components/SomatocartaGrupal';
+import Login from '@/pages/Login';
 
 function emptyPerfilRestringido(): PerfilRestringido {
   return {
@@ -452,5 +453,3 @@ export default function App() {
     </Routes>
   );
 }
-
-import Login from '@/pages/Login';
