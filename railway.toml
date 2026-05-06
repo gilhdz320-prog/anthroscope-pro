@@ -1,11 +1,11 @@
 [build]
 builder = "NIXPACKS"
+buildCommand = "echo 'Using pre-built dist'"
 
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/api/ping"
 healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
 
 [environments.production.deploy]
 startCommand = "npm start"
