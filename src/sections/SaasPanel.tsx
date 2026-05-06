@@ -36,9 +36,9 @@ export function SaasPanel() {
     <div className="space-y-8">
       {/* HEADER */}
       <div className="text-center space-y-4 py-8">
-        <h2 className="text-3xl font-bold">{t('saas.titulo')}</h2>
-        <p className="text-slate-600 max-w-2xl mx-auto">{t('saas.descripcion')}</p>
-        <Badge className="bg-emerald-500 text-white">{t('saas.yaListo')}</Badge>
+        <h2 className="text-3xl font-bold">ANTHROSCOPE<span className="text-emerald-500"> PRO</span> — Licencia Profesional</h2>
+        <p className="text-slate-600 max-w-2xl mx-auto">El único sistema de kinantropometría con modelo de 5 componentes, avatar 3D anatómico, potencial genético y reportes nivel 4.</p>
+        <Badge className="bg-emerald-500 text-white">Compatible con protocolos ISAK Nivel 1-4</Badge>
       </div>
 
       {/* PLANS */}
@@ -168,10 +168,10 @@ export function SaasPanel() {
       <Card className="bg-slate-900 text-white">
         <CardContent className="p-8 text-center">
           <Globe className="w-12 h-12 mx-auto mb-4 text-emerald-400" />
-          <h3 className="text-2xl font-bold mb-2">¿Listo para ofrecerlo al ISAK?</h3>
+          <h3 className="text-2xl font-bold mb-2">¿Listo para escalar ANTHROSCOPE PRO?</h3>
           <p className="text-slate-400 max-w-xl mx-auto mb-6">
             Este sistema ya incluye: modelo de 5 componentes validado por disección cadavérica, 
-            ETM automatizado con estándares ISAK, somatocarta profesional, avatar 3D paramétrico, 
+            ETM automatizado con estándares internacionales, somatocarta profesional, avatar 3D anatómico, 
             reportes firmados Nivel 4, y soporte multilingüe. Es un producto listo para licencia 
             institucional o SaaS global.
           </p>
@@ -180,7 +180,7 @@ export function SaasPanel() {
               <Shield className="w-4 h-4 mr-2" /> Probar Demo Nivel 4
             </Button>
             <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
-              <Users className="w-4 h-4 mr-2" /> Contactar ISAK Global
+              <Users className="w-4 h-4 mr-2" /> Contactar Ventas
             </Button>
           </div>
         </CardContent>

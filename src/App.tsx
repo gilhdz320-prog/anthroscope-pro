@@ -12,7 +12,7 @@ import {
   User, Ruler, Activity, FileText, BarChart3, Save,
   Download, RotateCcw, ChevronRight, Dna, Calculator,
   ShieldCheck, Globe, History, CreditCard, Printer,
-  Sparkles, FileSpreadsheet, Users,
+  Sparkles, FileSpreadsheet, Users, DnaIcon, Brain,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -34,6 +34,7 @@ import { ReporteView } from '@/sections/ReporteView';
 import { SaasPanel } from '@/sections/SaasPanel';
 import { GruposPanel } from '@/sections/GruposPanel';
 import { CuadrantesHolway } from '@/sections/CuadrantesHolway';
+import { PotencialGenetico } from '@/sections/PotencialGenetico';
 import { Avatar3D } from '@/components/three/Avatar3D';
 import { Somatocarta } from '@/components/Somatocarta';
 import { SomatocartaGrupal } from '@/components/SomatocartaGrupal';
@@ -54,13 +55,12 @@ function emptyPerfilCompleto(): PerfilCompleto {
 }
 
 function ISAKApp() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const [lang, setLang] = useState('es');
 
   const toggleLang = () => {
     const next = lang === 'es' ? 'en' : lang === 'en' ? 'fr' : lang === 'fr' ? 'pt' : 'es';
-    // @ts-ignore
     i18n.changeLanguage(next);
     setLang(next);
   };
@@ -107,7 +107,7 @@ function ISAKApp() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ISAK_${resultado.sujeto.nombre}_${resultado.sujeto.fechaEvaluacion}.json`;
+    a.download = `ANTHROSCOPE_${resultado.sujeto.nombre}_${resultado.sujeto.fechaEvaluacion}.json`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(t('reporte.guardarJSON'));
@@ -125,7 +125,7 @@ function ISAKApp() {
     const imgWidth = 210;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    pdf.save(`ISAK_Report_${resultado.sujeto.nombre}.pdf`);
+    pdf.save(`ANTHROSCOPE_Report_${resultado.sujeto.nombre}.pdf`);
     toast.success('PDF exportado');
   }, [resultado]);
 
@@ -153,8 +153,8 @@ function ISAKApp() {
       { Campo: '% Grasa Durnin-Womersley', Valor: resultado.clasicos?.durninWomersleyPorcentajeGrasa },
       { Campo: 'Masa Muscular Lee (kg)', Valor: resultado.clasicos?.leeMasaMuscular },
     ]);
-    XLSX.utils.book_append_sheet(wb, ws, 'Evaluacion ISAK');
-    XLSX.writeFile(wb, `ISAK_Excel_${resultado.sujeto.nombre}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, 'Evaluacion');
+    XLSX.writeFile(wb, `ANTHROSCOPE_Excel_${resultado.sujeto.nombre}.xlsx`);
     toast.success('Excel exportado');
   }, [resultado]);
 
@@ -165,7 +165,7 @@ function ISAKApp() {
       fechaEvaluacion: new Date().toISOString().split('T')[0],
       deporte: 'Halterofilia / Fuerza Olimpica',
       nivelActividad: 'atleta',
-      notas: 'Caso de estudio Nivel 4 ISAK. Atleta masculino 26 años, halterofilia categoria 81kg.',
+      notas: 'Caso de estudio Nivel 4. Atleta masculino 26 años, halterofilia categoria 81kg.',
     };
     const demoPerfilR: PerfilRestringido = {
       masaCorporal: 80.5, estatura: 172.0,
@@ -192,27 +192,35 @@ function ISAKApp() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Toaster position="top-right" richColors />
+
       <header className="bg-slate-900 text-white py-4 px-6 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-emerald-500 p-2 rounded-lg"><Dna className="w-6 h-6 text-white" /></div>
+            <div className="bg-emerald-500 p-2 rounded-lg">
+              <Dna className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">{t('app.title')}</h1>
-              <p className="text-xs text-slate-400">{t('app.subtitle')}</p>
+              <h1 className="text-xl font-bold tracking-tight">ANTHROSCOPE<span className="text-emerald-400"> PRO</span></h1>
+              <p className="text-xs text-slate-400">Kinanthropometric Intelligence System</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {user && <span className="text-sm text-emerald-400 hidden md:inline">{user.name || user.email}</span>}
             {user && <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white" onClick={logout}>Salir</Button>}
-            <Button variant="outline" size="sm" className="border-amber-400 text-amber-300 hover:bg-amber-900 hover:text-amber-200 hidden md:flex" onClick={cargarDemoNivel4}>
+            <Button variant="outline" size="sm" className="border-amber-400 text-amber-300 hover:bg-amber-900 hover:text-amber-200 hidden md:flex"
+              onClick={cargarDemoNivel4}>
               <Sparkles className="w-4 h-4 mr-1" /> Demo Nivel 4
             </Button>
             <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white" onClick={toggleLang}>
               <Globe className="w-4 h-4 mr-1" /> {lang === 'es' ? 'EN' : lang === 'en' ? 'FR' : lang === 'fr' ? 'PT' : 'ES'}
             </Button>
-            <Badge variant="outline" className="border-emerald-500 text-emerald-400">{t('app.nivel')} {nivel}</Badge>
+            <Badge variant="outline" className="border-emerald-500 text-emerald-400">
+              Nivel {nivel}
+            </Badge>
             <Select value={String(nivel)} onValueChange={(v) => setNivel(Number(v) as 1 | 2 | 3 | 4)}>
-              <SelectTrigger className="w-32 bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-32 bg-slate-800 border-slate-700 text-white">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-700">
                 <SelectItem value="1">Nivel 1</SelectItem>
                 <SelectItem value="2">Nivel 2</SelectItem>
@@ -223,87 +231,208 @@ function ISAKApp() {
           </div>
         </div>
       </header>
+
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-8 bg-white border shadow-sm p-1">
-            <TabsTrigger value="sujeto" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><User className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.sujeto')}</span></TabsTrigger>
-            <TabsTrigger value="mediciones" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><Ruler className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.mediciones')}</span></TabsTrigger>
-            <TabsTrigger value="etm" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><ShieldCheck className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.etm')}</span></TabsTrigger>
-            <TabsTrigger value="resultados" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><BarChart3 className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.resultados')}</span></TabsTrigger>
-            <TabsTrigger value="reporte" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><FileText className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.reporte')}</span></TabsTrigger>
-            <TabsTrigger value="grupos" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><Users className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.grupos')}</span></TabsTrigger>
-            <TabsTrigger value="historial" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><History className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.historial')}</span></TabsTrigger>
-            <TabsTrigger value="saas" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm"><CreditCard className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{t('tabs.saas')}</span></TabsTrigger>
+          <TabsList className="grid grid-cols-9 bg-white border shadow-sm p-1">
+            <TabsTrigger value="sujeto" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <User className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.sujeto')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="mediciones" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <Ruler className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.mediciones')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="etm" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.etm')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="resultados" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <BarChart3 className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.resultados')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="reporte" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <FileText className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.reporte')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="grupos" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <Users className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.grupos')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="genetico" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <Brain className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.genetico') || 'Genético'}</span>
+            </TabsTrigger>
+            <TabsTrigger value="historial" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <History className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.historial')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="saas" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
+              <CreditCard className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.saas')}</span>
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sujeto" className="space-y-4"><SujetoForm sujeto={sujeto} onChange={setSujeto} /></TabsContent>
+          <TabsContent value="sujeto" className="space-y-4">
+            <SujetoForm sujeto={sujeto} onChange={setSujeto} />
+          </TabsContent>
+
           <TabsContent value="mediciones" className="space-y-4">
             <MedicionesForm perfilR={perfilR} perfilC={perfilC} nivel={nivel} onChangeR={setPerfilR} onChangeC={setPerfilC} />
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => { setPerfilR(emptyPerfilRestringido()); setPerfilC(emptyPerfilCompleto()); }}><RotateCcw className="w-4 h-4 mr-2" /> {t('mediciones.limpiar')}</Button>
-              <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleCalcular}><Calculator className="w-4 h-4 mr-2" /> {t('mediciones.calcular')}</Button>
+              <Button variant="outline" onClick={() => { setPerfilR(emptyPerfilRestringido()); setPerfilC(emptyPerfilCompleto()); }}>
+                <RotateCcw className="w-4 h-4 mr-2" /> {t('mediciones.limpiar')}
+              </Button>
+              <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleCalcular}>
+                <Calculator className="w-4 h-4 mr-2" /> {t('mediciones.calcular')}
+              </Button>
             </div>
           </TabsContent>
-          <TabsContent value="etm" className="space-y-4"><ETMPanel /></TabsContent>
+
+          <TabsContent value="etm" className="space-y-4">
+            <ETMPanel />
+          </TabsContent>
+
           <TabsContent value="resultados" className="space-y-4">
             {resultado ? (
               <div className="space-y-6">
                 <ResultadosDashboard resultado={resultado} />
+
                 {resultado.somatotipo && (
                   <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Activity className="w-5 h-5 text-emerald-600" />{t('resultados.somatocarta')}</h3>
-                    <div className="h-[400px]"><Somatocarta endomorfia={resultado.somatotipo.endomorfia} mesomorfia={resultado.somatotipo.mesomorfia} ectomorfia={resultado.somatotipo.ectomorfia} nombre={resultado.sujeto.nombre} /></div>
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-emerald-600" />
+                      {t('resultados.somatocarta')}
+                    </h3>
+                    <div className="h-[400px]">
+                      <Somatocarta
+                        endomorfia={resultado.somatotipo.endomorfia}
+                        mesomorfia={resultado.somatotipo.mesomorfia}
+                        ectomorfia={resultado.somatotipo.ectomorfia}
+                        nombre={resultado.sujeto.nombre}
+                      />
+                    </div>
                   </Card>
                 )}
+
                 {resultado.cincoComponentes && (
                   <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Dna className="w-5 h-5 text-blue-600" />{t('resultados.avatar3d')}</h3>
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <Dna className="w-5 h-5 text-blue-600" />
+                      {t('resultados.avatar3d')}
+                    </h3>
                     <Suspense fallback={<div className="h-[500px] flex items-center justify-center">Cargando avatar 3D...</div>}>
-                      <Avatar3D estatura={resultado.perfil.estatura} masaCorporal={resultado.perfil.masaCorporal} siriPorcentajeGrasa={resultado.siriPorcentajeGrasa || 0} cincoComponentes={resultado.cincoComponentes} somatotipo={resultado.somatotipo} />
+                      <Avatar3D
+                        estatura={resultado.perfil.estatura}
+                        masaCorporal={resultado.perfil.masaCorporal}
+                        siriPorcentajeGrasa={resultado.siriPorcentajeGrasa || 0}
+                        cincoComponentes={resultado.cincoComponentes}
+                        somatotipo={resultado.somatotipo}
+                      />
                     </Suspense>
                   </Card>
                 )}
+
                 {resultado.somatotipo && resultado.cincoComponentes && (
                   <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Activity className="w-5 h-5 text-purple-600" />Cuadrantes de Francis Holway</h3>
-                    <CuadrantesHolway masaMuscular={resultado.cincoComponentes.masaMuscular} masaGrasa={resultado.cincoComponentes.masaAdiposa} imo={resultado.cincoComponentes.indiceMusculoOseo} porcentajeGrasa={resultado.siriPorcentajeGrasa || 0} nombre={resultado.sujeto.nombre} />
+                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-purple-600" />
+                      Cuadrantes de Francis Holway
+                    </h3>
+                    <CuadrantesHolway
+                      masaMuscular={resultado.cincoComponentes.masaMuscular}
+                      masaGrasa={resultado.cincoComponentes.masaAdiposa}
+                      imo={resultado.cincoComponentes.indiceMusculoOseo}
+                      porcentajeGrasa={resultado.siriPorcentajeGrasa || 0}
+                    />
                   </Card>
                 )}
               </div>
             ) : (
-              <Card className="p-12 text-center"><Activity className="w-12 h-12 text-slate-300 mx-auto mb-4" /><p className="text-slate-500">{t('common.sinDatos')}</p><Button className="mt-4 bg-emerald-600 hover:bg-emerald-700" onClick={() => setActiveTab('mediciones')}>{t('tabs.mediciones')} <ChevronRight className="w-4 h-4 ml-2" /></Button></Card>
+              <Card className="p-12 text-center">
+                <Activity className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500">{t('common.sinDatos')}</p>
+                <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700" onClick={() => setActiveTab('mediciones')}>
+                  {t('tabs.mediciones')} <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
             )}
           </TabsContent>
+
           <TabsContent value="reporte" className="space-y-4">
             {resultado ? (
               <>
                 <div className="flex justify-end gap-3 mb-4 no-print">
-                  <Button variant="outline" onClick={handleGuardar}><Save className="w-4 h-4 mr-2" />{t('reporte.guardarJSON')}</Button>
-                  <Button variant="outline" onClick={handleExportExcel}><FileSpreadsheet className="w-4 h-4 mr-2" />Excel</Button>
-                  <Button variant="outline" onClick={handleExportPDF}><Printer className="w-4 h-4 mr-2" />PDF</Button>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => window.print()}><Download className="w-4 h-4 mr-2" />{t('reporte.imprimirPDF')}</Button>
+                  <Button variant="outline" onClick={handleGuardar}>
+                    <Save className="w-4 h-4 mr-2" /> {t('reporte.guardarJSON')}
+                  </Button>
+                  <Button variant="outline" onClick={handleExportExcel}>
+                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Excel
+                  </Button>
+                  <Button variant="outline" onClick={handleExportPDF}>
+                    <Printer className="w-4 h-4 mr-2" /> PDF
+                  </Button>
+                  <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => window.print()}>
+                    <Download className="w-4 h-4 mr-2" /> {t('reporte.imprimirPDF')}
+                  </Button>
                 </div>
-                <div id="reporte-isak"><ReporteView resultado={resultado} /></div>
+                <div id="reporte-isak">
+                  <ReporteView resultado={resultado} />
+                </div>
               </>
-            ) : <Card className="p-12 text-center"><FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" /><p className="text-slate-500">{t('common.sinDatos')}</p></Card>}
+            ) : (
+              <Card className="p-12 text-center">
+                <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500">{t('common.sinDatos')}</p>
+              </Card>
+            )}
           </TabsContent>
-          <TabsContent value="grupos" className="space-y-4"><GruposPanel /></TabsContent>
+
+          <TabsContent value="grupos" className="space-y-4">
+            <GruposPanel />
+          </TabsContent>
+
+          <TabsContent value="genetico" className="space-y-4">
+            {resultado?.cincoComponentes ? (
+              <PotencialGenetico
+                masaMuscular={resultado.cincoComponentes.masaMuscular}
+                masaOsea={resultado.cincoComponentes.masaOsea}
+                imo={resultado.cincoComponentes.indiceMusculoOseo}
+                sexo={sujeto.sexo}
+                estatura={sujeto.sexo === 'masculino' ? 178.5 : 165.0}
+              />
+            ) : (
+              <Card className="p-12 text-center">
+                <Brain className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500">Calcula primero la evaluación para ver el potencial genético</p>
+                <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700" onClick={() => setActiveTab('mediciones')}>
+                  Ir a Mediciones <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Card>
+            )}
+          </TabsContent>
+
           <TabsContent value="historial" className="space-y-4">
             <Card className="p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><History className="w-5 h-5 text-emerald-600" />{t('resultados.historial')}</h3>
-              {historial.length === 0 ? <p className="text-slate-400 text-center py-8">{t('common.sinDatos')}</p> : (
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <History className="w-5 h-5 text-emerald-600" />
+                {t('resultados.historial')}
+              </h3>
+              {historial.length === 0 ? (
+                <p className="text-slate-400 text-center py-8">{t('common.sinDatos')}</p>
+              ) : (
                 <div className="space-y-3">
                   {historial.map((h, i) => (
                     <div key={i} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow cursor-pointer" onClick={() => { setResultado(h); setActiveTab('resultados'); }}>
-                      <div><p className="font-semibold">{h.sujeto.nombre}</p><p className="text-xs text-slate-500">{h.sujeto.fechaEvaluacion} | {t('app.nivel')} {h.nivel}</p></div>
-                      <div className="text-right"><p className="text-sm font-mono">IMC {h.imc} | {h.siriPorcentajeGrasa}% Grasa</p><p className="text-xs text-slate-500">{h.somatotipo?.categoria}</p></div>
+                      <div>
+                        <p className="font-semibold">{h.sujeto.nombre}</p>
+                        <p className="text-xs text-slate-500">{h.sujeto.fechaEvaluacion} | Nivel {h.nivel}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-mono">IMC {h.imc} | {h.siriPorcentajeGrasa}% Grasa</p>
+                        <p className="text-xs text-slate-500">{h.somatotipo?.categoria}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
             </Card>
           </TabsContent>
-          <TabsContent value="saas" className="space-y-4"><SaasPanel /></TabsContent>
+
+          <TabsContent value="saas" className="space-y-4">
+            <SaasPanel />
+          </TabsContent>
         </Tabs>
       </main>
     </div>

@@ -27,10 +27,10 @@ export function ReporteView({ resultado }: { resultado: ResultadoISAK }) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-1">{t('reporte.titulo')}</h1>
-            <p className="text-slate-400 print:text-slate-600">{t('reporte.protocolo')}</p>
+            <p className="text-slate-400 print:text-slate-600">Protocolo de Antropometría Avanzada - ANTHROSCOPE PRO</p>
           </div>
           <div className="text-right print:hidden">
-            <p className="text-sm text-slate-400">{t('app.nivel')} {resultado.nivel}</p>
+            <p className="text-sm text-slate-400">Nivel {resultado.nivel}</p>
             <Badge className="bg-emerald-500 mt-1">{esPerfilCompleto ? t('app.perfilCompleto') : t('app.perfilRestringido')}</Badge>
           </div>
         </div>
@@ -197,9 +197,9 @@ export function ReporteView({ resultado }: { resultado: ResultadoISAK }) {
       </Card>
 
       <div className="text-center text-xs text-slate-400 pt-8 pb-4 border-t">
-        <p>{t('reporte.generadoPor')}</p>
-        <p>{t('reporte.estandares')}</p>
-        <p className="mt-1">{t('reporte.referencias')}</p>
+        <p>Reporte generado con ANTHROSCOPE PRO</p>
+        <p>Sistema de Kinantropometría Avanzada | Compatible con protocolos ISAK Nivel 1-4</p>
+        <p className="mt-1">Modelo de 5 Componentes: Ross & Kerr (1993) | Somatotipo: Heath-Carter | Phantom: Ross (1974) | IMO: Holway & Barrios (2012)</p>
       </div>
     </div>
   );
