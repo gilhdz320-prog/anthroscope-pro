@@ -133,3 +133,101 @@ export type Equipo = typeof equipos.$inferSelect;
 export type Atleta = typeof atletas.$inferSelect;
 export type Evaluacion = typeof evaluaciones.$inferSelect;
 export type ReferenciaDeporte = typeof referenciasDeporte.$inferSelect;
+
+// ============================================================
+// ANTHROSCOPE PRO - Sistema de Suscripciones (SaaS)
+// ============================================================
+
+export const planes = mysqlTable("planes", {
+  id: serial("id").primaryKey(),
+  codigo: varchar("codigo", { length: 50 }).notNull().unique(), // "individual", "team", "institucional"
+  nombre: varchar("nombre", { length: 255 }).notNull(),
+  descripcion: text("descripcion"),
+  precioMensual: decimal("precioMensual", { precision: 10, scale: 2 }).notNull(),
+  precioAnual: decimal("precioAnual", { precision: 10, scale: 2 }).notNull(),
+  maxEvaluadores: int("maxEvaluadores").default(1).notNull(), // 1 = individual, 5 = team, 0 = ilimitado
+  maxAtletas: int("maxAtletas").default(0).notNull(), // 0 = ilimitado
+  incluyeReportesNivel4: mysqlEnum("incluyeReportesNivel4", ["si", "no"]).default("si").notNull(),
+  incluyeAPI: mysqlEnum("incluyeAPI", ["si", "no"]).default("no").notNull(),
+  incluyeWhiteLabel: mysqlEnum("incluyeWhiteLabel", ["si", "no"]).default("no").notNull(),
+  activo: mysqlEnum("activo", ["si", "no"]).default("si").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const suscripciones = mysqlTable("suscripciones", {
+  id: serial("id").primaryKey(),
+  userId: bigint("userId", { mode: "number", unsigned: true }).notNull(),
+  planId: bigint("planId", { mode: "number", unsigned: true }).notNull(),
+  
+  // Estado de la suscripcion
+  estado: mysqlEnum("estado", ["activa", "cancelada", "vencida", "trial"]).default("trial").notNull(),
+  
+  // Periodo
+  fechaInicio: timestamp("fechaInicio").defaultNow().notNull(),
+  fechaFin: timestamp("fechaFin").notNull(),
+  periodo: mysqlEnum("periodo", ["mensual", "anual"]).default("mensual").notNull(),
+  
+  // Pago
+  montoPagado: decimal("montoPagado", { precision: 10, scale: 2 }),
+  moneda: varchar("moneda", { length: 3 }).default("USD"),
+  metodoPago: varchar("metodoPago", { length: 50 }), // "stripe", "paypal", "transfer"
+  paymentId: varchar("paymentId", { length: 255 }), // ID externo del proveedor de pagos
+  
+  // Tracking de uso
+  evaluacionesRealizadas: int("evaluacionesRealizadas").default(0),
+  atletasRegistrados: int("atletasRegistrados").default(0),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull().$onUpdate(() => new Date()),
+});
+
+export const pagos = mysqlTable("pagos", {
+  id: serial("id").primaryKey(),
+  suscripcionId: bigint("suscripcionId", { mode: "number", unsigned: true }).notNull(),
+  userId: bigint("userId", { mode: "number", unsigned: true }).notNull(),
+  
+  monto: decimal("monto", { precision: 10, scale: 2 }).notNull(),
+  moneda: varchar("moneda", { length: 3 }).default("USD").notNull(),
+  estado: mysqlEnum("estado", ["pendiente", "completado", "fallido", "reembolsado"]).default("pendiente").notNull(),
+  metodoPago: varchar("metodoPago", { length: 50 }).notNull(),
+  paymentProviderId: varchar("paymentProviderId", { length: 255 }), // Stripe payment intent ID
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Organizaciones (para plan Institucional)
+export const organizaciones = mysqlTable("organizaciones", {
+  id: serial("id").primaryKey(),
+  nombre: varchar("nombre", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(), // URL amigable
+  logoUrl: text("logoUrl"),
+  colorPrimario: varchar("colorPrimario", { length: 7 }).default("#10b981"),
+  adminUserId: bigint("adminUserId", { mode: "number", unsigned: true }).notNull(),
+  
+  // Config de la org
+  maxEvaluadores: int("maxEvaluadores").default(0).notNull(), // 0 = ilimitado
+  maxEquipos: int("maxEquipos").default(0).notNull(),
+  
+  // Suscripcion de la org
+  suscripcionActiva: mysqlEnum("suscripcionActiva", ["si", "no"]).default("no").notNull(),
+  planCodigo: varchar("planCodigo", { length: 50 }),
+  fechaVencimiento: timestamp("fechaVencimiento"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Miembros de organizacion
+export const miembrosOrg = mysqlTable("miembros_org", {
+  id: serial("id").primaryKey(),
+  orgId: bigint("orgId", { mode: "number", unsigned: true }).notNull(),
+  userId: bigint("userId", { mode: "number", unsigned: true }).notNull(),
+  rol: mysqlEnum("rol", ["admin", "evaluador", "viewer"]).default("evaluador").notNull(),
+  activo: mysqlEnum("activo", ["si", "no"]).default("si").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Plan = typeof planes.$inferSelect;
+export type Suscripcion = typeof suscripciones.$inferSelect;
+export type Pago = typeof pagos.$inferSelect;
+export type Organizacion = typeof organizaciones.$inferSelect;
+export type MiembroOrg = typeof miembrosOrg.$inferSelect;
