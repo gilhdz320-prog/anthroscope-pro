@@ -78,28 +78,33 @@ function ISAKApp() {
   const [historial, setHistorial] = useState<ResultadoISAK[]>([]);
 
   const handleCalcular = useCallback(() => {
-    if (!sujeto.nombre) { toast.error(t('common.sinDatos')); return; }
-    if (perfilR.estatura <= 0 || perfilR.masaCorporal <= 0) {
-      toast.error('Estatura y masa corporal son obligatorias'); return;
+    try {
+      if (!sujeto.nombre) { toast.error(t('common.sinDatos')); return; }
+      if (perfilR.estatura <= 0 || perfilR.masaCorporal <= 0) {
+        toast.error('Estatura y masa corporal son obligatorias'); return;
+      }
+      const esCompleto = nivel >= 2;
+      const perfil = esCompleto ? perfilC : perfilR;
+      const indices = calcularIndices(perfilR, perfilR.estatura, perfilR.masaCorporal);
+      const somatotipo = calcularSomatotipo(perfilR, sujeto.sexo);
+      let cincoComponentes: ResultadoISAK['cincoComponentes'] = undefined;
+      if (esCompleto) {
+        try { cincoComponentes = calcularCincoComponentes(perfilC, perfilC.estatura, perfilC.masaCorporal, sujeto.sexo); }
+        catch (e) { console.warn('5 componentes error:', e); toast.warning('No se pudo calcular 5 componentes'); }
+      }
+      const edad = sujeto.fechaNacimiento ? Math.floor((new Date().getTime() - new Date(sujeto.fechaNacimiento).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : undefined;
+      const clasicos = calcularClasicos(perfilR, perfilR.estatura, perfilR.masaCorporal, sujeto.sexo, edad);
+      let phantom: ResultadoISAK['phantom'] = undefined;
+      if (esCompleto) { try { phantom = calcularPhantom(perfilC, perfilC.estatura); } catch (e) { console.warn('Phantom error:', e); } }
+      const resultado: ResultadoISAK = { sujeto, perfil, nivel, esPerfilCompleto: esCompleto, somatotipo, cincoComponentes, clasicos, phantom, ...indices };
+      setResultado(resultado);
+      setHistorial(prev => [resultado, ...prev].slice(0, 50));
+      toast.success('Evaluación calculada');
+      setActiveTab('resultados');
+    } catch (err: any) {
+      console.error('CALCULAR ERROR:', err);
+      toast.error('Error al calcular: ' + (err?.message || 'Error desconocido'));
     }
-    const esCompleto = nivel >= 2;
-    const perfil = esCompleto ? perfilC : perfilR;
-    const indices = calcularIndices(perfilR, perfilR.estatura, perfilR.masaCorporal);
-    const somatotipo = calcularSomatotipo(perfilR, sujeto.sexo);
-    let cincoComponentes: ResultadoISAK['cincoComponentes'] = undefined;
-    if (esCompleto) {
-      try { cincoComponentes = calcularCincoComponentes(perfilC, perfilC.estatura, perfilC.masaCorporal, sujeto.sexo); }
-      catch (e) { toast.warning('No se pudo calcular 5 componentes'); }
-    }
-    const edad = sujeto.fechaNacimiento ? Math.floor((new Date().getTime() - new Date(sujeto.fechaNacimiento).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : undefined;
-    const clasicos = calcularClasicos(perfilR, perfilR.estatura, perfilR.masaCorporal, sujeto.sexo, edad);
-    let phantom: ResultadoISAK['phantom'] = undefined;
-    if (esCompleto) { try { phantom = calcularPhantom(perfilC, perfilC.estatura); } catch (e) {} }
-    const resultado: ResultadoISAK = { sujeto, perfil, nivel, esPerfilCompleto: esCompleto, somatotipo, cincoComponentes, clasicos, phantom, ...indices };
-    setResultado(resultado);
-    setHistorial(prev => [resultado, ...prev].slice(0, 50));
-    toast.success('Evaluación calculada');
-    setActiveTab('resultados');
   }, [sujeto, perfilR, perfilC, nivel, t]);
 
   const handleGuardar = useCallback(() => {
