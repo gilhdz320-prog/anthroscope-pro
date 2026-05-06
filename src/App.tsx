@@ -234,33 +234,33 @@ function ISAKApp() {
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-9 bg-white border shadow-sm p-1">
-            <TabsTrigger value="sujeto" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <User className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.sujeto')}</span>
+          <TabsList className="flex flex-wrap gap-1 bg-white border shadow-sm p-1 h-auto">
+            <TabsTrigger value="sujeto" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <User className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.sujeto')}</span>
             </TabsTrigger>
-            <TabsTrigger value="mediciones" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <Ruler className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.mediciones')}</span>
+            <TabsTrigger value="mediciones" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Ruler className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.mediciones')}</span>
             </TabsTrigger>
-            <TabsTrigger value="etm" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.etm')}</span>
+            <TabsTrigger value="etm" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <ShieldCheck className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.etm')}</span>
             </TabsTrigger>
-            <TabsTrigger value="resultados" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <BarChart3 className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.resultados')}</span>
+            <TabsTrigger value="resultados" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <BarChart3 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.resultados')}</span>
             </TabsTrigger>
-            <TabsTrigger value="reporte" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <FileText className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.reporte')}</span>
+            <TabsTrigger value="reporte" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <FileText className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.reporte')}</span>
             </TabsTrigger>
-            <TabsTrigger value="grupos" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <Users className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.grupos')}</span>
+            <TabsTrigger value="grupos" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Users className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.grupos')}</span>
             </TabsTrigger>
-            <TabsTrigger value="genetico" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <Brain className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.genetico') || 'Genético'}</span>
+            <TabsTrigger value="genetico" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Brain className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.genetico') || 'Genetico'}</span>
             </TabsTrigger>
-            <TabsTrigger value="historial" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <History className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.historial')}</span>
+            <TabsTrigger value="historial" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <History className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.historial')}</span>
             </TabsTrigger>
-            <TabsTrigger value="saas" className="flex items-center gap-1 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm">
-              <CreditCard className="w-3 h-3 md:w-4 md:h-4" /> <span className="hidden sm:inline">{t('tabs.saas')}</span>
+            <TabsTrigger value="saas" className="flex items-center gap-1.5 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <CreditCard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{t('tabs.saas')}</span>
             </TabsTrigger>
           </TabsList>
 
