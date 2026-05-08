@@ -71,3 +71,4 @@ export default defineConfig([
   },
 ])
 ```
+ANTHROSCOPE PRO - Backend connected
