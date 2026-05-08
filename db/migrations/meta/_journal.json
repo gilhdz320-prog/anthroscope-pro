@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1778113610662,
+      "tag": "0000_solid_vampiro",
+      "breakpoints": true
+    }
+  ]
+}

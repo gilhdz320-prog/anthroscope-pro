@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ANTHROSCOPE PRO Dark Theme — matches landing page */
+    --background: 240 20% 2.4%;
+    --foreground: 240 6% 95%;
+    --card: 234 18% 8%;
+    --card-foreground: 240 6% 95%;
+    --popover: 234 18% 8%;
+    --popover-foreground: 240 6% 95%;
+    --primary: 74 100% 50%;
+    --primary-foreground: 240 20% 2.4%;
+    --secondary: 234 15% 12%;
+    --secondary-foreground: 240 6% 95%;
+    --muted: 234 15% 12%;
+    --muted-foreground: 234 8% 58%;
+    --accent: 74 100% 50%;
+    --accent-foreground: 240 20% 2.4%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 234 15% 14%;
+    --input: 234 15% 14%;
+    --ring: 74 100% 50%;
+    --radius: 0.625rem;
+    --sidebar-background: 234 18% 8%;
+    --sidebar-foreground: 240 6% 95%;
+    --sidebar-primary: 74 100% 50%;
+    --sidebar-primary-foreground: 240 20% 2.4%;
+    --sidebar-accent: 234 15% 12%;
+    --sidebar-accent-foreground: 240 6% 95%;
+    --sidebar-border: 234 15% 14%;
+    --sidebar-ring: 74 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

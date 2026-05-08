@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTHROSCOPE PRO — Kinanthropometric Intelligence System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050608;
+      --bg-elevated: #0a0b0f;
+      --bg-card: #11121a;
+      --bg-card-hover: #181a25;
+      --lime: #D4FF00;
+      --lime-dim: #a8cc00;
+      --text: #f0f0f5;
+      --text-secondary: #8a8d9e;
+      --text-muted: #55576b;
+      --border: #1e1f2e;
+      --border-hover: #2e2f42;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient-start: #D4FF00;
+      --gradient-end: #a8cc00;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: var(--lime);
+      color: var(--bg);
+    }
+
+    /* Custom cursor */
+    .cursor-dot {
+      width: 6px; height: 6px;
+      background: var(--lime);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 99999;
+      transition: transform 0.08s ease;
+    }
+    .cursor-ring {
+      width: 32px; height: 32px;
+      border: 1.5px solid var(--lime);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 99998;
+      transition: transform 0.15s ease, width 0.2s, height 0.2s;
+      opacity: 0.5;
+    }
+    .cursor-ring.hovering {
+      width: 48px; height: 48px;
+      border-color: var(--lime-dim);
+      opacity: 0.8;
+    }
+    @media (pointer: coarse) {
+      .cursor-dot, .cursor-ring { display: none; }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Navigation */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      backdrop-filter: blur(20px);
+      background: rgba(5,6,8,0.85);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(5,6,8,0.95);
+      border-bottom-color: var(--border-hover);
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 68px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-weight: 800; font-size: 1.15rem;
+      letter-spacing: -0.02em; color: var(--text);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .logo span { color: var(--lime); }
+    .nav-links {
+      display: flex; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none; font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--lime); }
+    .nav-cta {
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .lang-switch {
+      font-size: 0.8rem; color: var(--text-muted);
+      cursor: pointer; background: none; border: 1px solid var(--border);
+      padding: 0.4rem 0.8rem; border-radius: 6px;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .lang-switch:hover { border-color: var(--lime); color: var(--lime); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px; font-weight: 600; font-size: 0.875rem;
+      text-decoration: none; border: none; cursor: pointer;
+      font-family: inherit; transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(212,255,0,0.25);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--lime); color: var(--lime);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 68px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 20%, rgba(212,255,0,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(99,102,241,0.06) 0%, transparent 50%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(212,255,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,255,0,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+    }
+    .hero-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 4rem 2rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+      position: relative; z-index: 2;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8rem; color: var(--lime);
+      font-weight: 500; margin-bottom: 1.5rem;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--lime); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 .accent {
+      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    .hero-buttons {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .hero-stats {
+      display: flex; gap: 2.5rem;
+    }
+    .hero-stat .num {
+      font-size: 1.8rem; font-weight: 800;
+      color: var(--lime); font-family: 'JetBrains Mono', monospace;
+    }
+    .hero-stat .label {
+      font-size: 0.8rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* Dashboard preview */
+    .dashboard-preview {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow:
+        0 0 0 1px rgba(212,255,0,0.1),
+        0 20px 60px rgba(0,0,0,0.5),
+        0 0 80px rgba(212,255,0,0.05);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(3deg);
+      transition: transform 0.5s ease;
+    }
+    .dashboard-preview:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+    .dash-header {
+      background: var(--bg-elevated);
+      padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dash-dot.r { background: #ff5f57; }
+    .dash-dot.y { background: #febc2e; }
+    .dash-dot.g { background: #28c840; }
+    .dash-body {
+      background: var(--bg-card);
+      padding: 1.25rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .dash-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .dash-card-header {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .dash-card-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+    }
+    .dash-card-title {
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .dash-metric {
+      font-size: 1.4rem; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .dash-metric.lime { color: var(--lime); }
+    .dash-metric.indigo { color: var(--accent-light); }
+    .dash-metric.amber { color: var(--warning); }
+    .dash-metric.green { color: var(--success); }
+    .dash-sub {
+      font-size: 0.7rem; color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .dash-chart {
+      grid-column: 1 / -1;
+      height: 80px;
+      display: flex; align-items: end; gap: 4px;
+      padding: 0.5rem 0;
+    }
+    .dash-bar {
+      flex: 1;
+      background: linear-gradient(to top, var(--lime), transparent);
+      border-radius: 3px 3px 0 0;
+      opacity: 0.6;
+      min-height: 10px;
+    }
+    .dash-bar:nth-child(3n) { opacity: 1; height: 70% !important; }
+
+    /* Ticker */
+    .ticker {
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-track {
+      display: flex; gap: 3rem;
+      width: max-content;
+      animation: ticker-scroll 30s linear infinite;
+    }
+    .ticker:hover .ticker-track { animation-play-state: paused; }
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .ticker-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Sections */
+    section { padding: 6rem 2rem; }
+    .section-inner {
+      max-width: 1280px; margin: 0 auto;
+    }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--lime); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      line-height: 1.1; margin-bottom: 1rem;
+    }
+    .section-desc {
+      font-size: 1.1rem; color: var(--text-secondary);
+      max-width: 600px; line-height: 1.7;
+    }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--lime), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+    .feature-title {
+      font-size: 1.05rem; font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .feature-desc {
+      font-size: 0.875rem; color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Video section */
+    .video-section {
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .video-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-top: 3rem;
+      aspect-ratio: 16/9;
+      max-height: 520px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
+    }
+    .video-placeholder {
+      text-align: center;
+    }
+    .play-btn {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 40px rgba(212,255,0,0.3);
+    }
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 15px 50px rgba(212,255,0,0.4);
+    }
+    .play-btn svg { width: 28px; height: 28px; fill: var(--bg); margin-left: 4px; }
+
+    /* Comparison table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 3rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .comparison-table th {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-weight: 600; font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .comparison-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table tr:nth-child(even) {
+      background: rgba(255,255,255,0.02);
+    }
+    .comparison-table td {
+      color: var(--text-secondary);
+    }
+    .comparison-table .feature-name {
+      color: var(--text); font-weight: 500;
+    }
+    .check { color: var(--success); font-weight: 700; }
+    .cross { color: var(--danger); opacity: 0.5; }
+    .anthro-row td { background: rgba(212,255,0,0.04); }
+    .anthro-row .feature-name { color: var(--lime); }
+
+    /* Pricing */
+    .pricing-cards {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .pricing-card.popular {
+      border-color: var(--lime);
+      box-shadow: 0 0 40px rgba(212,255,0,0.08);
+    }
+    .pricing-card.popular::before {
+      content: attr(data-badge);
+      position: absolute; top: -1px; right: 2rem;
+      background: linear-gradient(135deg, var(--lime), var(--lime-dim));
+      color: var(--bg); font-size: 0.7rem;
+      font-weight: 700; padding: 0.35rem 0.9rem;
+      border-radius: 0 0 8px 8px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .pricing-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+    }
+    .pricing-card.popular:hover {
+      box-shadow: 0 10px 50px rgba(212,255,0,0.15);
+    }
+    .pricing-name {
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .pricing-desc {
+      font-size: 0.8rem; color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .pricing-price {
+      font-size: 2.5rem; font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 0.25rem;
+    }
+    .pricing-price .currency { font-size: 1.2rem; vertical-align: super; }
+    .pricing-period {
+      font-size: 0.85rem; color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .pricing-features {
+      list-style: none; margin-bottom: 2rem;
+    }
+    .pricing-features li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.4rem 0;
+      font-size: 0.85rem; color: var(--text-secondary);
+    }
+    .pricing-features li svg {
+      width: 16px; height: 16px;
+      color: var(--lime); flex-shrink: 0; margin-top: 2px;
+    }
+    .pricing-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 0.8rem;
+      font-size: 0.95rem;
+    }
+
+    /* Testimonials */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.25rem; margin-top: 3rem;
+    }
+    .testimonial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.75rem;
+    }
+    .testimonial-stars {
+      color: var(--warning);
+      font-size: 1rem; margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+    }
+    .testimonial-text {
+      font-size: 0.9rem; color: var(--text-secondary);
+      line-height: 1.7; margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .testimonial-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+      color: white;
+    }
+    .testimonial-info .name {
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .testimonial-info .role {
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+
+    /* FAQ */
+    .faq-list {
+      max-width: 800px; margin: 3rem auto 0;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-question {
+      width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 0;
+      background: none; border: none;
+      color: var(--text); font-family: inherit;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; text-align: left;
+    }
+    .faq-question:hover { color: var(--lime); }
+    .faq-icon {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-bottom: 1.25rem;
+    }
+    .faq-answer p {
+      color: var(--text-secondary);
+      font-size: 0.9rem; line-height: 1.7;
+    }
+
+    /* Contact */
+    .contact-section {
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+    }
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; margin-top: 3rem;
+    }
+    .contact-info h3 {
+      font-size: 1.5rem; font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .contact-info p {
+      color: var(--text-secondary);
+      font-size: 0.95rem; line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .contact-links {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .contact-link {
+      display: flex; align-items: center; gap: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none; font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .contact-link:hover { color: var(--lime); }
+    .contact-link-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .contact-form {
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .form-group {
+      display: flex; flex-direction: column; gap: 0.35rem;
+    }
+    .form-group label {
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .form-group input,
+    .form-group textarea {
+      padding: 0.85rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text); font-family: inherit;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--lime);
+    }
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 4rem 2rem 2rem;
+    }
+    .footer-inner {
+      max-width: 1280px; margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    .footer-brand p {
+      color: var(--text-muted);
+      font-size: 0.85rem; margin-top: 1rem;
+      line-height: 1.7;
+    }
+    .footer-col h4 {
+      font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0.75rem;
+    }
+    .footer-col a {
+      color: var(--text-muted);
+      text-decoration: none; font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .footer-col a:hover { color: var(--lime); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p {
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .footer-socials {
+      display: flex; gap: 1rem;
+    }
+    .footer-socials a {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .footer-socials a:hover {
+      border-color: var(--lime); color: var(--lime);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .dashboard-preview { max-width: 600px; margin: 0 auto; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero { min-height: auto; padding: 6rem 0 3rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-stats { gap: 1.5rem; }
+      section { padding: 4rem 1.5rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-cards { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .floating { animation: float 4s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <!-- Custom Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">&#9670;</div>
+        ANTHROSCOPE<span>PRO</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features" data-i="nav_features">Features</a></li>
+        <li><a href="#comparison" data-i="nav_comparison">vs Excel</a></li>
+        <li><a href="#pricing" data-i="nav_pricing">Pricing</a></li>
+        <li><a href="#testimonials" data-i="nav_testimonials">Testimonials</a></li>
+        <li><a href="#faq" data-i="nav_faq">FAQ</a></li>
+        <li><a href="#contact" data-i="nav_contact">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="lang-switch" onclick="toggleLang()" data-i="lang_switch">ES</button>
+        <a href="/#/app" class="btn btn-primary" data-i="nav_cta">Launch App</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="reveal">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          <span data-i="hero_badge">ISAK Level 1-4 Compatible</span>
+        </div>
+        <h1 data-i="hero_title">
+          The Professional<br>
+          <span class="accent">Kinanthropometry</span><br>
+          Intelligence System
+        </h1>
+        <p class="hero-desc" data-i="hero_desc">
+          Replace Excel spreadsheets with precision. 5-component Ross & Kerr model,
+          Heath-Carter somatotype, 3D avatar, Phantom Stratagem, and genetic muscle
+          potential — all in one platform built for ISAK practitioners.
+        </p>
+        <div class="hero-buttons">
+          <a href="/#/app" class="btn btn-primary">
+            <span data-i="hero_cta_primary">Start Free Trial</span>
+          </a>
+          <a href="#features" class="btn btn-ghost" data-i="hero_cta_secondary">See Features</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num">5-C</div>
+            <div class="label" data-i="hero_stat1">Component Model</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">12</div>
+            <div class="label" data-i="hero_stat2">Sport References</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">4</div>
+            <div class="label" data-i="hero_stat3">Languages</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">3D</div>
+            <div class="label" data-i="hero_stat4">Anatomy Avatar</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <div class="dashboard-preview floating">
+          <div class="dash-header">
+            <div class="dash-dot r"></div>
+            <div class="dash-dot y"></div>
+            <div class="dash-dot g"></div>
+            <span style="margin-left:0.5rem;font-size:0.75rem;color:var(--text-muted);">ANTHROSCOPE PRO — Nivel 4 Evaluation</span>
+          </div>
+          <div class="dash-body">
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div class="dash-card-icon" style="background:rgba(212,255,0,0.1);">&#9670;</div>
+                <span class="dash-card-title">Somatotype</span>
+              </div>
+              <div class="dash-metric lime">3.5-5.2-2.1</div>
+              <div class="dash-sub">Balanced Mesomorph</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div class="dash-card-icon" style="background:rgba(99,102,241,0.15);">&#9671;</div>
+                <span class="dash-card-title">% Body Fat (Siri)</span>
+              </div>
+              <div class="dash-metric indigo">8.4%</div>
+              <div class="dash-sub">Elite athlete range</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div class="dash-card-icon" style="background:rgba(245,158,11,0.15);">&#9632;</div>
+                <span class="dash-card-title">Muscle Mass</span>
+              </div>
+              <div class="dash-metric amber">38.2 kg</div>
+              <div class="dash-sub">5-Component Ross & Kerr</div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-card-header">
+                <div class="dash-card-icon" style="background:rgba(34,197,94,0.15);">&#9670;</div>
+                <span class="dash-card-title">IMO Score</span>
+              </div>
+              <div class="dash-metric green">4.85</div>
+              <div class="dash-sub">Natural elite range</div>
+            </div>
+            <div class="dash-chart">
+              <div class="dash-bar" style="height:30%"></div>
+              <div class="dash-bar" style="height:50%"></div>
+              <div class="dash-bar" style="height:40%"></div>
+              <div class="dash-bar" style="height:70%"></div>
+              <div class="dash-bar" style="height:55%"></div>
+              <div class="dash-bar" style="height:85%"></div>
+              <div class="dash-bar" style="height:60%"></div>
+              <div class="dash-bar" style="height:45%"></div>
+              <div class="dash-bar" style="height:75%"></div>
+              <div class="dash-bar" style="height:65%"></div>
+              <div class="dash-bar" style="height:50%"></div>
+              <div class="dash-bar" style="height:90%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        5-Component Ross & Kerr Model
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Heath-Carter Somatotype
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Phantom Stratagem Z-Scores
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        3D Anatomical Avatar
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Genetic Muscle Potential (IMO)
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Holway 6-Quadrant Matrix
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        ETM Quality Control
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        12 Global Sport References
+      </div>
+      <!-- duplicate for seamless loop -->
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        5-Component Ross & Kerr Model
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Heath-Carter Somatotype
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Phantom Stratagem Z-Scores
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        3D Anatomical Avatar
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Genetic Muscle Potential (IMO)
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Holway 6-Quadrant Matrix
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        ETM Quality Control
+      </div>
+      <div class="ticker-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        12 Global Sport References
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="features_label">Platform Features</span></div>
+        <h2 class="section-title" data-i="features_title">Everything a Level 4 Practitioner Needs</h2>
+        <p class="section-desc" data-i="features_desc">
+          Built from the ground up for ISAK-certified professionals. No more spreadsheet errors,
+          manual calculations, or fragmented tools. One platform, complete precision.
+        </p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon" style="background:rgba(212,255,0,0.1);color:var(--lime);">&#9670;</div>
+          <h3 class="feature-title" data-i="feat1_title">5-Component Ross & Kerr</h3>
+          <p class="feature-desc" data-i="feat1_desc">
+            Cadaver-validated model separating adipose, muscular, bone, skin, and residual mass.
+            The gold standard for body composition analysis.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon" style="background:rgba(99,102,241,0.15);color:var(--accent-light);">&#9671;</div>
+          <h3 class="feature-title" data-i="feat2_title">Heath-Carter Somatotype</h3>
+          <p class="feature-desc" data-i="feat2_desc">
+            Automatic endomorphy, mesomorphy, and ectomorphy calculation with interactive
+            somatocarta visualization for professional reports.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon" style="background:rgba(34,197,94,0.15);color:var(--success);">&#9632;</div>
+          <h3 class="feature-title" data-i="feat3_title">Phantom Stratagem</h3>
+          <p class="feature-desc" data-i="feat3_desc">
+            Z-score normalization to the 170.18cm reference phantom. Compare any athlete
+            against 12 sport-specific global references.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon" style="background:rgba(245,158,11,0.15);color:var(--warning);">&#9670;</div>
+          <h3 class="feature-title" data-i="feat4_title">3D Anatomical Avatar</h3>
+          <p class="feature-desc" data-i="feat4_desc">
+            Three.js-powered parametric visualization of body composition. Show clients
+            their muscle, fat, and bone distribution in real-time 3D.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">&#9671;</div>
+          <h3 class="feature-title" data-i="feat5_title">Genetic Muscle Potential</h3>
+          <p class="feature-desc" data-i="feat5_desc">
+            IMO-based ceiling calculator using Holway & Barrios (2012) norms. Know exactly
+            how much muscle an athlete can build naturally.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon" style="background:rgba(168,85,247,0.15);color:#a78bfa;">&#9632;</div>
+          <h3 class="feature-title" data-i="feat6_title">Holway 6-Quadrant Matrix</h3>
+          <p class="feature-desc" data-i="feat6_desc">
+            Muscle high/low x Fat high/low classification with specific recommendations
+            for each quadrant. Team dashboard included.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon" style="background:rgba(6,182,212,0.15);color:#22d3ee;">&#9670;</div>
+          <h3 class="feature-title" data-i="feat7_title">Automated ETM</h3>
+          <p class="feature-desc" data-i="feat7_desc">
+            Technical Error of Measurement calculator with ISAK standards validation.
+            Intra-evaluator quality control with pass/fail indicators.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon" style="background:rgba(236,72,153,0.15);color:#f472b6;">&#9671;</div>
+          <h3 class="feature-title" data-i="feat8_title">Professional Reports</h3>
+          <p class="feature-desc" data-i="feat8_desc">
+            PDF reports signed for Nivel 4, Excel exports, JSON data. Bilingual reports
+            in English, Spanish, French, and Portuguese.
+          </p>
+        </div>
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon" style="background:rgba(100,116,139,0.15);color:#94a3b8;">&#9632;</div>
+          <h3 class="feature-title" data-i="feat9_title">Group & Team Analytics</h3>
+          <p class="feature-desc" data-i="feat9_desc">
+            Full team evaluation with population analysis, normative comparisons,
+            and group somatocharts for coaches and federations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section id="comparison" style="background:var(--bg-elevated);border-top:1px solid var(--border);">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="compare_label">Comparison</span></div>
+        <h2 class="section-title" data-i="compare_title">Why Upgrade from Excel?</h2>
+        <p class="section-desc" data-i="compare_desc">
+          Stop wrestling with formulas that break. Start producing clinical-grade evaluations in minutes, not hours.
+        </p>
+      </div>
+      <div class="reveal reveal-delay-1" style="overflow-x:auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th data-i="table_feature">Feature</th>
+              <th data-i="table_excel">Excel</th>
+              <th style="color:var(--lime);" data-i="table_anthro">ANTHROSCOPE PRO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="anthro-row">
+              <td class="feature-name" data-i="comp1_feat">5-Component Model (Ross & Kerr)</td>
+              <td class="cross">&#10007; Manual formulas</td>
+              <td class="check">&#10003; Automatic</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Heath-Carter Somatotype</td>
+              <td class="cross">&#10007; Separate tool</td>
+              <td class="check">&#10003; Built-in + chart</td>
+            </tr>
+            <tr class="anthro-row">
+              <td class="feature-name">Phantom Stratagem Z-Scores</td>
+              <td class="cross">&#10007; Not available</td>
+              <td class="check">&#10003; 12 sport refs</td>
+            </tr>
+            <tr>
+              <td class="feature-name">3D Avatar Visualization</td>
+              <td class="cross">&#10007; Impossible</td>
+              <td class="check">&#10003; Three.js powered</td>
+            </tr>
+            <tr class="anthro-row">
+              <td class="feature-name">Genetic Muscle Potential (IMO)</td>
+              <td class="cross">&#10007; Not available</td>
+              <td class="check">&#10003; Holway validated</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Holway 6-Quadrant Matrix</td>
+              <td class="cross">&#10007; Manual chart</td>
+              <td class="check">&#10003; Interactive</td>
+            </tr>
+            <tr class="anthro-row">
+              <td class="feature-name">ETM Quality Control</td>
+              <td class="cross">&#10007; Manual calc</td>
+              <td class="check">&#10003; Auto-validation</td>
+            </tr>
+            <tr>
+              <td class="feature-name">ISAK Nivel 4 Reports</td>
+              <td class="cross">&#10007; No template</td>
+              <td class="check">&#10003; PDF + Excel</td>
+            </tr>
+            <tr class="anthro-row">
+              <td class="feature-name">Multi-language (EN/ES/FR/PT)</td>
+              <td class="cross">&#10007; One language</td>
+              <td class="check">&#10003; 4 languages</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Group / Team Analytics</td>
+              <td class="cross">&#10007; Per file</td>
+              <td class="check">&#10003; Dashboard</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="pricing_label">Pricing</span></div>
+        <h2 class="section-title" data-i="pricing_title">Choose Your Plan</h2>
+        <p class="section-desc" data-i="pricing_desc">
+          Start with a 14-day free trial. No credit card required. Upgrade or cancel anytime.
+        </p>
+      </div>
+      <div class="pricing-cards">
+        <div class="pricing-card reveal reveal-delay-1">
+          <div class="pricing-name" data-i="plan1_name">Starter</div>
+          <div class="pricing-desc" data-i="plan1_desc">For students and Level 1 trainees</div>
+          <div class="pricing-price"><span class="currency">$</span>9.99</div>
+          <div class="pricing-period" data-i="plan1_period">per month</div>
+          <ul class="pricing-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan1_f1">Perfil Restringido (Nivel 1)</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan1_f2">Basic somatotype</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan1_f3">PDF reports</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan1_f4">1 language</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span>Email support</span></li>
+          </ul>
+          <a href="/#/app" class="btn btn-ghost pricing-btn" data-i="plan_cta">Start Trial</a>
+        </div>
+
+        <div class="pricing-card popular reveal reveal-delay-2" data-badge="MOST POPULAR">
+          <div class="pricing-name" style="color:var(--lime);" data-i="plan2_name">Professional</div>
+          <div class="pricing-desc" data-i="plan2_desc">For certified ISAK practitioners</div>
+          <div class="pricing-price" style="color:var(--lime);"><span class="currency">$</span>39.99</div>
+          <div class="pricing-period" data-i="plan2_period">per month or $399.99/year (save 17%)</div>
+          <ul class="pricing-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f1">Perfil Completo (Nivel 2-4)</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f2">5-Component Model + Avatar 3D</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f3">Phantom + 12 sport refs</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f4">Genetic potential + Holway matrix</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f5">4 languages (EN/ES/FR/PT)</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f6">Group evaluation (up to 25)</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan2_f7">Priority support</span></li>
+          </ul>
+          <a href="/#/app" class="btn btn-primary pricing-btn" data-i="plan_cta_popular">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card reveal reveal-delay-3">
+          <div class="pricing-name" data-i="plan3_name">Institution</div>
+          <div class="pricing-desc" data-i="plan3_desc">For federations, universities & clubs</div>
+          <div class="pricing-price"><span class="currency">$</span>299.99</div>
+          <div class="pricing-period" data-i="plan3_period">per month or $2,999/year</div>
+          <ul class="pricing-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f1">Everything in Professional</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f2">Unlimited evaluators</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f3">White-label with your brand</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f4">API access</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f5">SSO / Organization login</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg><span data-i="plan3_f6">Dedicated account manager</span></li>
+          </ul>
+          <a href="#contact" class="btn btn-ghost pricing-btn" data-i="plan_cta_contact">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" style="background:var(--bg-elevated);border-top:1px solid var(--border);">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="testimonials_label">Testimonials</span></div>
+        <h2 class="section-title" data-i="testimonials_title">Trusted by Professionals</h2>
+        <p class="section-desc" data-i="testimonials_desc">
+          From Olympic training centers to university research labs, ANTHROSCOPE PRO is the tool serious practitioners choose.
+        </p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i="test1_text">
+            "After 15 years using Excel for anthropometric evaluations, switching to ANTHROSCOPE PRO
+            was like going from a bicycle to a sports car. The 5-component model calculation alone
+            saves me 20 minutes per athlete."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">DR</div>
+            <div class="testimonial-info">
+              <div class="name">Dr. Ricardo Mendez</div>
+              <div class="role">ISAK Level 4, CONADE Mexico</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i="test2_text">
+            "The genetic muscle potential module using IMO is a game-changer for our strength coaches.
+            We can now set realistic expectations with athletes based on actual skeletal metrics, not guesswork."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">FH</div>
+            <div class="testimonial-info">
+              <div class="name">Francis Holway</div>
+              <div class="role">Sport Nutritionist, Argentina Rugby Union</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text" data-i="test3_text">
+            "We evaluated 200+ athletes across 8 Olympic sports in 3 weeks. The group analytics
+            and Holway quadrant matrix gave our coaches instant visual insights. No Excel sheet could do this."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MC</div>
+            <div class="testimonial-info">
+              <div class="name">Maria Cecilia Lopez</div>
+              <div class="role">Head of Kinanthropometry, High Performance Center Spain</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="section-inner" style="text-align:center;">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="faq_label">FAQ</span></div>
+        <h2 class="section-title" data-i="faq_title">Frequently Asked Questions</h2>
+        <p class="section-desc" style="margin:0 auto;" data-i="faq_desc">
+          Everything you need to know about ANTHROSCOPE PRO. Can't find the answer? Reach out to our team.
+        </p>
+      </div>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq1_q">Do I need to be ISAK certified to use ANTHROSCOPE PRO?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq1_a">No. While the platform is built for ISAK protocols Level 1-4, anyone can use it. Students often start with the Starter plan during their Level 1 course and upgrade as they certify. The built-in ETM validation actually helps you learn proper measurement technique.</p></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq2_q">Can I export data to Excel or my club's database?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq2_a">Absolutely. Every evaluation exports to PDF (signed Nivel 4 format), Excel (.xlsx with all formulas), and JSON for API integrations. The Institutional plan includes a full REST API to sync directly with your club's athlete management system.</p></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq3_q">How does the 14-day free trial work?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq3_a">Sign up with any email — no credit card required. You get full Professional plan access for 14 days. If you don't upgrade, you keep access to the Starter plan features permanently. We won't delete your data.</p></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq4_q">Can multiple evaluators in my institution share one account?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq4_a">Individual and Professional plans are per-evaluator. For teams, the Institution plan includes unlimited evaluator seats with organization-level SSO. Each evaluator gets their own login, but all data lives in one central dashboard that the admin controls.</p></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq5_q">Is my data secure? Where is it stored?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq5_a">All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We use SOC-2 compliant cloud infrastructure. Athlete PII is pseudonymized by default. For federations requiring on-premise deployment, contact our sales team.</p></div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span data-i="faq6_q">Do you offer academic or non-profit discounts?</span>
+          <span class="faq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="faq-answer"><p data-i="faq6_a">Yes. University research labs, non-profit sports federations, and ISAK teaching courses qualify for 40% off any plan. Contact us with your institution credentials and we'll apply the discount within 24 hours.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="contact-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">&#9670; <span data-i="contact_label">Contact</span></div>
+        <h2 class="section-title" data-i="contact_title">Let's Talk</h2>
+        <p class="section-desc" data-i="contact_desc">
+          Whether you're a solo practitioner or a national federation, we'll get you set up within 24 hours.
+        </p>
+      </div>
+      <div class="contact-grid">
+        <div class="reveal reveal-delay-1">
+          <div class="contact-info">
+            <h3 data-i="contact_subtitle">Get in Touch</h3>
+            <p data-i="contact_text">
+              Have questions about the platform, need a custom integration, or want to discuss
+              institutional licensing? Our team responds to every message personally.
+            </p>
+            <div class="contact-links">
+              <a href="mailto:hello@anthroscope.pro" class="contact-link">
+                <div class="contact-link-icon">&#9993;</div>
+                hello@anthroscope.pro
+              </a>
+              <a href="#" class="contact-link">
+                <div class="contact-link-icon">&#9635;</div>
+                WhatsApp Business
+              </a>
+              <div class="contact-link">
+                <div class="contact-link-icon">&#9733;</div>
+                <span data-i="contact_hours">Response time: under 4 hours</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+            <div class="form-group">
+              <label data-i="form_name">Name</label>
+              <input type="text" name="name" required placeholder="Dr. Jane Smith">
+            </div>
+            <div class="form-group">
+              <label data-i="form_email">Email</label>
+              <input type="email" name="email" required placeholder="jane@institution.edu">
+            </div>
+            <div class="form-group">
+              <label data-i="form_org">Organization (optional)</label>
+              <input type="text" name="organization" placeholder="University / Federation / Club">
+            </div>
+            <div class="form-group">
+              <label data-i="form_message">Message</label>
+              <textarea name="message" required placeholder="Tell us about your needs..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="justify-content:center;" data-i="form_submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <div class="logo-icon">&#9670;</div>
+            ANTHROSCOPE<span>PRO</span>
+          </a>
+          <p data-i="footer_desc">
+            The professional kinanthropometry intelligence system.
+            Built by practitioners, for practitioners. Validated by cadaver dissection
+            and trusted by Olympic training centers worldwide.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i="footer_product">Product</h4>
+          <ul>
+            <li><a href="#features" data-i="footer_features">Features</a></li>
+            <li><a href="#pricing" data-i="footer_pricing">Pricing</a></li>
+            <li><a href="#" data-i="footer_changelog">Changelog</a></li>
+            <li><a href="#" data-i="footer_roadmap">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i="footer_resources">Resources</h4>
+          <ul>
+            <li><a href="#" data-i="footer_docs">Documentation</a></li>
+            <li><a href="#" data-i="footer_api">API Reference</a></li>
+            <li><a href="#faq" data-i="footer_faq">FAQ</a></li>
+            <li><a href="#" data-i="footer_blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 data-i="footer_company">Company</h4>
+          <ul>
+            <li><a href="#contact" data-i="footer_contact">Contact</a></li>
+            <li><a href="#" data-i="footer_privacy">Privacy</a></li>
+            <li><a href="#" data-i="footer_terms">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 ANTHROSCOPE PRO. <span data-i="footer_rights">All rights reserved.</span></p>
+        <div class="footer-socials">
+          <a href="#" aria-label="Twitter">&#120143;</a>
+          <a href="#" aria-label="LinkedIn">in</a>
+          <a href="#" aria-label="Instagram">&#9670;</a>
+          <a href="#" aria-label="YouTube">&#9654;</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // ===== I18N =====
+    const translations = {
+      en: {
+        nav_features: 'Features',
+        nav_comparison: 'vs Excel',
+        nav_pricing: 'Pricing',
+        nav_testimonials: 'Testimonials',
+        nav_faq: 'FAQ',
+        nav_contact: 'Contact',
+        lang_switch: 'ES',
+        nav_cta: 'Launch App',
+        hero_badge: 'ISAK Level 1-4 Compatible',
+        hero_title: 'The Professional<br><span class="accent">Kinanthropometry</span><br>Intelligence System',
+        hero_desc: 'Replace Excel spreadsheets with precision. 5-component Ross & Kerr model, Heath-Carter somatotype, 3D avatar, Phantom Stratagem, and genetic muscle potential — all in one platform built for ISAK practitioners.',
+        hero_cta_primary: 'Start Free Trial',
+        hero_cta_secondary: 'See Features',
+        hero_stat1: 'Component Model',
+        hero_stat2: 'Sport References',
+        hero_stat3: 'Languages',
+        hero_stat4: 'Anatomy Avatar',
+        features_label: 'Platform Features',
+        features_title: 'Everything a Level 4 Practitioner Needs',
+        features_desc: 'Built from the ground up for ISAK-certified professionals. No more spreadsheet errors, manual calculations, or fragmented tools.',
+        feat1_title: '5-Component Ross & Kerr',
+        feat1_desc: 'Cadaver-validated model separating adipose, muscular, bone, skin, and residual mass. The gold standard for body composition analysis.',
+        feat2_title: 'Heath-Carter Somatotype',
+        feat2_desc: 'Automatic endomorphy, mesomorphy, and ectomorphy calculation with interactive somatocarta visualization for professional reports.',
+        feat3_title: 'Phantom Stratagem',
+        feat3_desc: 'Z-score normalization to the 170.18cm reference phantom. Compare any athlete against 12 sport-specific global references.',
+        feat4_title: '3D Anatomical Avatar',
+        feat4_desc: 'Three.js-powered parametric visualization of body composition. Show clients their muscle, fat, and bone distribution in real-time 3D.',
+        feat5_title: 'Genetic Muscle Potential',
+        feat5_desc: 'IMO-based ceiling calculator using Holway & Barrios (2012) norms. Know exactly how much muscle an athlete can build naturally.',
+        feat6_title: 'Holway 6-Quadrant Matrix',
+        feat6_desc: 'Muscle high/low x Fat high/low classification with specific recommendations for each quadrant. Team dashboard included.',
+        feat7_title: 'Automated ETM',
+        feat7_desc: 'Technical Error of Measurement calculator with ISAK standards validation. Intra-evaluator quality control with pass/fail indicators.',
+        feat8_title: 'Professional Reports',
+        feat8_desc: 'PDF reports signed for Nivel 4, Excel exports, JSON data. Bilingual reports in English, Spanish, French, and Portuguese.',
+        feat9_title: 'Group & Team Analytics',
+        feat9_desc: 'Full team evaluation with population analysis, normative comparisons, and group somatocharts for coaches and federations.',
+        compare_label: 'Comparison',
+        compare_title: 'Why Upgrade from Excel?',
+        compare_desc: 'Stop wrestling with formulas that break. Start producing clinical-grade evaluations in minutes, not hours.',
+        table_feature: 'Feature',
+        table_excel: 'Excel',
+        table_anthro: 'ANTHROSCOPE PRO',
+        pricing_label: 'Pricing',
+        pricing_title: 'Choose Your Plan',
+        pricing_desc: 'Start with a 14-day free trial. No credit card required. Upgrade or cancel anytime.',
+        plan1_name: 'Starter',
+        plan1_desc: 'For students and Level 1 trainees',
+        plan1_period: 'per month',
+        plan1_f1: 'Perfil Restringido (Nivel 1)',
+        plan1_f2: 'Basic somatotype',
+        plan1_f3: 'PDF reports',
+        plan1_f4: '1 language',
+        plan2_name: 'Professional',
+        plan2_desc: 'For certified ISAK practitioners',
+        plan2_period: 'per month or $399.99/year (save 17%)',
+        plan2_f1: 'Perfil Completo (Nivel 2-4)',
+        plan2_f2: '5-Component Model + Avatar 3D',
+        plan2_f3: 'Phantom + 12 sport refs',
+        plan2_f4: 'Genetic potential + Holway matrix',
+        plan2_f5: '4 languages (EN/ES/FR/PT)',
+        plan2_f6: 'Group evaluation (up to 25)',
+        plan2_f7: 'Priority support',
+        plan3_name: 'Institution',
+        plan3_desc: 'For federations, universities & clubs',
+        plan3_period: 'per month or $2,999/year',
+        plan3_f1: 'Everything in Professional',
+        plan3_f2: 'Unlimited evaluators',
+        plan3_f3: 'White-label with your brand',
+        plan3_f4: 'API access',
+        plan3_f5: 'SSO / Organization login',
+        plan3_f6: 'Dedicated account manager',
+        plan_cta: 'Start Trial',
+        plan_cta_popular: 'Start Free Trial',
+        plan_cta_contact: 'Contact Sales',
+        testimonials_label: 'Testimonials',
+        testimonials_title: 'Trusted by Professionals',
+        testimonials_desc: 'From Olympic training centers to university research labs, ANTHROSCOPE PRO is the tool serious practitioners choose.',
+        faq_label: 'FAQ',
+        faq_title: 'Frequently Asked Questions',
+        faq_desc: "Everything you need to know about ANTHROSCOPE PRO. Can't find the answer? Reach out to our team.",
+        faq1_q: 'Do I need to be ISAK certified to use ANTHROSCOPE PRO?',
+        faq1_a: "No. While the platform is built for ISAK protocols Level 1-4, anyone can use it. Students often start with the Starter plan during their Level 1 course and upgrade as they certify. The built-in ETM validation actually helps you learn proper measurement technique.",
+        faq2_q: "Can I export data to Excel or my club's database?",
+        faq2_a: "Absolutely. Every evaluation exports to PDF (signed Nivel 4 format), Excel (.xlsx with all formulas), and JSON for API integrations. The Institutional plan includes a full REST API to sync directly with your club's athlete management system.",
+        faq3_q: 'How does the 14-day free trial work?',
+        faq3_a: "Sign up with any email — no credit card required. You get full Professional plan access for 14 days. If you don't upgrade, you keep access to the Starter plan features permanently. We won't delete your data.",
+        faq4_q: 'Can multiple evaluators in my institution share one account?',
+        faq4_a: "Individual and Professional plans are per-evaluator. For teams, the Institution plan includes unlimited evaluator seats with organization-level SSO. Each evaluator gets their own login, but all data lives in one central dashboard that the admin controls.",
+        faq5_q: 'Is my data secure? Where is it stored?',
+        faq5_a: 'All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We use SOC-2 compliant cloud infrastructure. Athlete PII is pseudonymized by default. For federations requiring on-premise deployment, contact our sales team.',
+        faq6_q: 'Do you offer academic or non-profit discounts?',
+        faq6_a: 'Yes. University research labs, non-profit sports federations, and ISAK teaching courses qualify for 40% off any plan. Contact us with your institution credentials and we\'ll apply the discount within 24 hours.',
+        contact_label: 'Contact',
+        contact_title: "Let's Talk",
+        contact_desc: "Whether you're a solo practitioner or a national federation, we'll get you set up within 24 hours.",
+        contact_subtitle: 'Get in Touch',
+        contact_text: 'Have questions about the platform, need a custom integration, or want to discuss institutional licensing? Our team responds to every message personally.',
+        contact_hours: 'Response time: under 4 hours',
+        form_name: 'Name',
+        form_email: 'Email',
+        form_org: 'Organization (optional)',
+        form_message: 'Message',
+        form_submit: 'Send Message',
+        footer_desc: 'The professional kinanthropometry intelligence system. Built by practitioners, for practitioners.',
+        footer_product: 'Product',
+        footer_features: 'Features',
+        footer_pricing: 'Pricing',
+        footer_changelog: 'Changelog',
+        footer_roadmap: 'Roadmap',
+        footer_resources: 'Resources',
+        footer_docs: 'Documentation',
+        footer_api: 'API Reference',
+        footer_faq: 'FAQ',
+        footer_blog: 'Blog',
+        footer_company: 'Company',
+        footer_contact: 'Contact',
+        footer_privacy: 'Privacy',
+        footer_terms: 'Terms',
+        footer_rights: 'All rights reserved.',
+      },
+      es: {
+        nav_features: 'Funciones',
+        nav_comparison: 'vs Excel',
+        nav_pricing: 'Precios',
+        nav_testimonials: 'Testimonios',
+        nav_faq: 'Preguntas',
+        nav_contact: 'Contacto',
+        lang_switch: 'EN',
+        nav_cta: 'Abrir App',
+        hero_badge: 'Compatible ISAK Nivel 1-4',
+        hero_title: 'El Sistema<br><span class="accent">Profesional de</span><br>Cinantropometria',
+        hero_desc: 'Reemplaza las hojas de Excel con precision. Modelo de 5 componentes Ross & Kerr, somatotipo Heath-Carter, avatar 3D, Phantom Stratagem y potencial genetico muscular — todo en una plataforma construida para profesionales ISAK.',
+        hero_cta_primary: 'Prueba Gratis 14 Dias',
+        hero_cta_secondary: 'Ver Funciones',
+        hero_stat1: 'Modelo Componentes',
+        hero_stat2: 'Refs. Deportivas',
+        hero_stat3: 'Idiomas',
+        hero_stat4: 'Avatar Anatomico',
+        features_label: 'Funciones de la Plataforma',
+        features_title: 'Todo lo que un Profesional Nivel 4 Necesita',
+        features_desc: 'Construido desde cero para profesionales certificados ISAK. No mas errores de hojas de calculo, calculos manuales ni herramientas fragmentadas.',
+        feat1_title: '5 Componentes Ross & Kerr',
+        feat1_desc: 'Modelo validado por diseccion cadaverica que separa masa adiposa, muscular, osea, piel y residual. El estandar de oro para analisis de composicion corporal.',
+        feat2_title: 'Somatotipo Heath-Carter',
+        feat2_desc: 'Calculo automatico de endomorfia, mesomorfia y ectomorfia con visualizacion interactiva de la somatocarta para reportes profesionales.',
+        feat3_title: 'Phantom Stratagem',
+        feat3_desc: 'Normalizacion Z-score al phantom de referencia de 170.18cm. Compara cualquier atleta contra 12 referencias globales especificas por deporte.',
+        feat4_title: 'Avatar 3D Anatomico',
+        feat4_desc: 'Visualizacion parametrica Three.js de la composicion corporal. Muestra a tus clientes su distribucion de musculo, grasa y hueso en 3D en tiempo real.',
+        feat5_title: 'Potencial Genetico Muscular',
+        feat5_desc: 'Calculadora de techo basada en IMO usando normas de Holway & Barrios (2012). Sab exactamente cuanto musculo puede ganar un atleta naturalmente.',
+        feat6_title: 'Matriz 6 Cuadrantes Holway',
+        feat6_desc: 'Clasificacion Musculo alto/bajo x Grasa alto/bajo con recomendaciones especificas para cada cuadrante. Dashboard de equipo incluido.',
+        feat7_title: 'ETM Automatizado',
+        feat7_desc: 'Calculadora de Error Tecnico de Medicion con validacion contra estandares ISAK. Control de calidad intra-evaluador con indicadores aprobado/rechazado.',
+        feat8_title: 'Reportes Profesionales',
+        feat8_desc: 'Reportes PDF firmados Nivel 4, exportacion Excel, datos JSON. Reportes bilingues en ingles, espanol, frances y portugues.',
+        feat9_title: 'Analitica Grupal y de Equipos',
+        feat9_desc: 'Evaluacion completa de equipos con analisis poblacional, comparaciones normativas y somatocartas grupales para entrenadores y federaciones.',
+        compare_label: 'Comparativa',
+        compare_title: 'Por que Cambiar de Excel?',
+        compare_desc: 'Deja de luchar con formulas que se rompen. Empieza a producir evaluaciones de grado clinico en minutos, no horas.',
+        table_feature: 'Caracteristica',
+        table_excel: 'Excel',
+        table_anthro: 'ANTHROSCOPE PRO',
+        pricing_label: 'Precios',
+        pricing_title: 'Elige tu Plan',
+        pricing_desc: 'Empieza con 14 dias de prueba gratis. Sin tarjeta de credito. Mejora o cancela cuando quieras.',
+        plan1_name: 'Inicio',
+        plan1_desc: 'Para estudiantes y cursantes Nivel 1',
+        plan1_period: 'por mes',
+        plan1_f1: 'Perfil Restringido (Nivel 1)',
+        plan1_f2: 'Somatotipo basico',
+        plan1_f3: 'Reportes PDF',
+        plan1_f4: '1 idioma',
+        plan2_name: 'Profesional',
+        plan2_desc: 'Para profesionales ISAK certificados',
+        plan2_period: 'por mes o $399.99/ano (ahorra 17%)',
+        plan2_f1: 'Perfil Completo (Nivel 2-4)',
+        plan2_f2: 'Modelo 5 Componentes + Avatar 3D',
+        plan2_f3: 'Phantom + 12 refs deportivas',
+        plan2_f4: 'Potencial genetico + matriz Holway',
+        plan2_f5: '4 idiomas (EN/ES/FR/PT)',
+        plan2_f6: 'Evaluacion grupal (hasta 25)',
+        plan2_f7: 'Soporte prioritario',
+        plan3_name: 'Institucion',
+        plan3_desc: 'Para federaciones, universidades y clubes',
+        plan3_period: 'por mes o $2,999/ano',
+        plan3_f1: 'Todo lo del Profesional',
+        plan3_f2: 'Evaluadores ilimitados',
+        plan3_f3: 'White-label con tu marca',
+        plan3_f4: 'Acceso API',
+        plan3_f5: 'SSO / Login organizacional',
+        plan3_f6: 'Gerente de cuenta dedicado',
+        plan_cta: 'Iniciar Prueba',
+        plan_cta_popular: 'Prueba Gratis 14 Dias',
+        plan_cta_contact: 'Contactar Ventas',
+        testimonials_label: 'Testimonios',
+        testimonials_title: 'Confian los Profesionales',
+        testimonials_desc: 'Desde centros de entrenamiento olimpico hasta laboratorios universitarios, ANTHROSCOPE PRO es la herramienta que eligen los profesionales serios.',
+        faq_label: 'Preguntas Frecuentes',
+        faq_title: 'Preguntas Frecuentes',
+        faq_desc: 'Todo lo que necesitas saber sobre ANTHROSCOPE PRO. No encuentras la respuesta? Contacta a nuestro equipo.',
+        faq1_q: 'Necesito estar certificado ISAK para usar ANTHROSCOPE PRO?',
+        faq1_a: 'No. Aunque la plataforma esta construida para protocolos ISAK Nivel 1-4, cualquiera puede usarla. Los estudiantes suelen empezar con el plan Inicio durante su curso Nivel 1 y mejoran al certificarse. La validacion ETM incorporada te ayuda a aprender tecnica de medicion correcta.',
+        faq2_q: 'Puedo exportar datos a Excel o a la base de datos de mi club?',
+        faq2_a: 'Por supuesto. Cada evaluacion se exporta a PDF (formato firmado Nivel 4), Excel (.xlsx con todas las formulas) y JSON para integraciones API. El plan Institucion incluye una API REST completa para sincronizar directamente con el sistema de gestion de atletas de tu club.',
+        faq3_q: 'Como funciona la prueba gratuita de 14 dias?',
+        faq3_a: 'Registrate con cualquier email — no se requiere tarjeta de credito. Tienes acceso completo al plan Profesional por 14 dias. Si no mejoras, conservas acceso permanente a las funciones del plan Inicio. No borramos tus datos.',
+        faq4_q: 'Pueden varios evaluadores en mi institucion compartir una cuenta?',
+        faq4_a: 'Los planes Individual y Profesional son por evaluador. Para equipos, el plan Institucion incluye asientos ilimitados de evaluadores con SSO a nivel organizacion. Cada evaluador tiene su propio login, pero todos los datos viven en un dashboard central que el admin controla.',
+        faq5_q: 'Mis datos estan seguros? Donde se almacenan?',
+        faq5_a: 'Todos los datos estan encriptados en reposo (AES-256) y en transito (TLS 1.3). Usamos infraestructura cloud compatible con SOC-2. La PII de atletas se pseudonimiza por defecto. Para federaciones que requieren despliegue on-premise, contacta a nuestro equipo de ventas.',
+        faq6_q: 'Ofrecen descuentos academicos o sin fines de lucro?',
+        faq6_a: 'Si. Laboratorios de investigacion universitarios, federaciones deportivas sin fines de lucro y cursos de ensenanza ISAK califican para 40% de descuento en cualquier plan. Contactanos con tus credenciales institucionales y aplicamos el descuento en 24 horas.',
+        contact_label: 'Contacto',
+        contact_title: 'Hablemos',
+        contact_desc: 'Ya seas un profesional independiente o una federacion nacional, te configuraremos en menos de 24 horas.',
+        contact_subtitle: 'Ponte en Contacto',
+        contact_text: 'Tienes preguntas sobre la plataforma, necesitas una integracion personalizada, o quieres discutir licenciamiento institucional? Nuestro equipo responde cada mensaje personalmente.',
+        contact_hours: 'Tiempo de respuesta: menos de 4 horas',
+        form_name: 'Nombre',
+        form_email: 'Email',
+        form_org: 'Organizacion (opcional)',
+        form_message: 'Mensaje',
+        form_submit: 'Enviar Mensaje',
+        footer_desc: 'El sistema profesional de inteligencia cinantropometrica. Construido por profesionales, para profesionales.',
+        footer_product: 'Producto',
+        footer_features: 'Funciones',
+        footer_pricing: 'Precios',
+        footer_changelog: 'Novedades',
+        footer_roadmap: 'Roadmap',
+        footer_resources: 'Recursos',
+        footer_docs: 'Documentacion',
+        footer_api: 'API',
+        footer_faq: 'Preguntas',
+        footer_blog: 'Blog',
+        footer_company: 'Empresa',
+        footer_contact: 'Contacto',
+        footer_privacy: 'Privacidad',
+        footer_terms: 'Terminos',
+        footer_rights: 'Todos los derechos reservados.',
+      }
+    };
+
+    let currentLang = 'en';
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'es' : 'en';
+      document.querySelectorAll('[data-i]').forEach(el => {
+        const key = el.getAttribute('data-i');
+        if (translations[currentLang][key]) {
+          if (key === 'hero_title') {
+            el.innerHTML = translations[currentLang][key];
+          } else {
+            el.textContent = translations[currentLang][key];
+          }
+        }
+      });
+    }
+
+    // ===== CUSTOM CURSOR =====
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      dot.style.left = e.clientX - 3 + 'px';
+      dot.style.top = e.clientY - 3 + 'px';
+      ring.style.left = e.clientX - 16 + 'px';
+      ring.style.top = e.clientY - 16 + 'px';
+    });
+    document.querySelectorAll('a, button, .faq-question').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
+    });
+
+    // ===== SCROLL REVEAL =====
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ===== NAVBAR SCROLL =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // ===== FAQ TOGGLE =====
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    }
+  </script>
+</body>
+</html>
