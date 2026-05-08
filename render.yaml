@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: anthroscope-pro
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_ID
+        sync: false
+      - key: APP_SECRET
+        sync: false
+      - key: KIMI_AUTH_URL
+        value: https://auth.kimi.com
+      - key: KIMI_OPEN_URL
+        value: https://open.kimi.com
+      - key: OWNER_UNION_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: PORT
+        value: 10000
