@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { bodyLimit } from "hono/body-limit";
 import type { HttpBindings } from "@hono/node-server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
@@ -12,6 +13,20 @@ import { suscripciones, pagos, planes } from "@db/schema";
 import { eq } from "drizzle-orm";
 
 const app = new Hono<{ Bindings: HttpBindings }>();
+
+// CORS - permitir frontend en Netlify y Kimi
+app.use(cors({
+  origin: [
+    "https://anthroscope.pro",
+    "https://www.anthroscope.pro",
+    "https://3aa5owlpngtai.kimi.page",
+    "http://localhost:5173",
+    "http://localhost:4173",
+  ],
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+}));
 
 // Healthcheck endpoint - Railway pings this to verify the service is alive
 app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
