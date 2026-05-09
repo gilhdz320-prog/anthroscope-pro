@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import './i18n';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route } from 'react-router';
@@ -12,12 +12,11 @@ import {
   User, Ruler, Activity, FileText, BarChart3, Save,
   Download, RotateCcw, ChevronRight, Dna, Calculator,
   ShieldCheck, Globe, History, CreditCard, Printer,
-  Sparkles, FileSpreadsheet, Users, Brain, TrendingUp, Zap, Upload, Trophy, Palette, Mail, Apple, ChefHat, MapPin, Heart, Droplets, MessageSquare, Calendar,
+  Sparkles, FileSpreadsheet, Users, Brain, TrendingUp, Zap, Upload, Trophy, Palette, Mail, Apple, ChefHat, MapPin, Heart, Droplets, MessageSquare, Calendar, Dumbbell, UtensilsCrossed, Moon, CheckCircle, Loader2,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 import { useAuth } from '@/hooks/useAuth';
-import { trpc } from '@/providers/trpc';
 import type { Sujeto, PerfilRestringido, PerfilCompleto, ResultadoISAK, MedicionesAvanzadas } from '@/types/isak';
 import {
   calcularSomatotipo,
@@ -46,14 +45,23 @@ import { ModoCompetencia } from '@/sections/ModoCompetencia';
 import { ImportarExcel } from '@/sections/ImportarExcel';
 import { NutricionPanel } from '@/sections/NutricionPanel';
 import { Recetario } from '@/sections/Recetario';
+const CitasPanel = lazy(() => import('@/sections/CitasPanel').then(m => ({ default: m.CitasPanel })));
+const PlanComidas = lazy(() => import('@/sections/PlanComidas').then(m => ({ default: m.PlanComidas })));
+const SuenoPanel = lazy(() => import('@/sections/SuenoPanel').then(m => ({ default: m.SuenoPanel })));
+import ClienteCheckin from '@/sections/ClienteCheckin';
+import CoachCheckins from '@/sections/CoachCheckins';
+const BibliotecaEjercicios = lazy(() => import('@/sections/BibliotecaEjercicios').then(m => ({ default: m.default })));
 import { ClientesPanel } from '@/sections/ClientesPanel';
+import { TrialGate } from '@/components/TrialGate';
 import { PortalCliente } from '@/sections/PortalCliente';
-import { AlimentosLATAM } from '@/sections/AlimentosLATAM';
-import { PeriodizacionNutricional } from '@/sections/PeriodizacionNutricional';
+const AlimentosLATAM = lazy(() => import('@/sections/AlimentosLATAM').then(m => ({ default: m.AlimentosLATAM })));
+const PeriodizacionNutricional = lazy(() => import('@/sections/PeriodizacionNutricional').then(m => ({ default: m.PeriodizacionNutricional })));
 import { HidratacionPanel } from '@/sections/HidratacionPanel';
-import { REDSModule } from '@/sections/REDSModule';
-import { WADAVerificador } from '@/sections/WADAVerificador';
+const REDSModule = lazy(() => import('@/sections/REDSModule').then(m => ({ default: m.REDSModule })));
+const WADAVerificador = lazy(() => import('@/sections/WADAVerificador').then(m => ({ default: m.WADAVerificador })));
+const WearablesPanel = lazy(() => import('@/sections/WearablesPanel').then(m => ({ default: m.default })));
 import { CoachDashboard } from '@/sections/CoachDashboard';
+const AITrainer = lazy(() => import('@/sections/AITrainer').then(m => ({ default: m.AITrainer })));
 import { NutriAICoach } from '@/sections/NutriAICoach';
 import { PlanIA } from '@/sections/PlanIA';
 import { CoachReportCard } from '@/lib/lenguajeCoach';
@@ -64,7 +72,11 @@ import { Somatocarta } from '@/components/Somatocarta';
 import { SomatocartaGrupal } from '@/components/SomatocartaGrupal';
 import Login from '@/pages/Login';
 import LandingPage from '@/pages/LandingPage';
+import { LandingDemo } from '@/pages/LandingDemo';
+import { PricingPage } from '@/pages/Pricing';
 import { encontrarReferencia, calcularPercentil, mensajePercentil } from '@/data/referenciasOlimpicas';
+import { TabErrorBoundary } from '@/components/TabErrorBoundary';
+import { GlobalErrorBoundary } from '@/components/GlobalErrorBoundary';
 
 function emptyPerfilRestringido(): PerfilRestringido {
   return {
@@ -87,6 +99,7 @@ function emptyPerfilCompleto(): PerfilCompleto {
 
 function ISAKApp() {
   const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const { user, logout } = useAuth();
   const [lang, setLang] = useState('es');
 
@@ -119,29 +132,6 @@ function ISAKApp() {
   });
   const [resultado, setResultado] = useState<ResultadoISAK | null>(null);
   const [historial, setHistorial] = useState<ResultadoISAK[]>([]);
-
-  const createPatient = trpc.patients.create.useMutation({
-    onSuccess: () => {
-      toast.success('Paciente guardado en la base de datos');
-    },
-    onError: (err) => {
-      toast.error('Error al guardar paciente: ' + err.message);
-    },
-  });
-
-  const handleGuardarPaciente = useCallback(() => {
-    if (!sujeto.nombre) {
-      toast.error('El nombre del paciente es obligatorio');
-      return;
-    }
-    createPatient.mutate({
-      nombre: sujeto.nombre,
-      fechaNacimiento: sujeto.fechaNacimiento || undefined,
-      sexo: sujeto.sexo,
-      deporte: sujeto.deporte || undefined,
-      notas: sujeto.notas || undefined,
-    });
-  }, [sujeto, createPatient]);
 
   const handleCalcular = useCallback(() => {
     try {
@@ -368,6 +358,9 @@ function ISAKApp() {
             <TabsTrigger value="alimentos" className="flex items-center gap-1.5 data-[state=active]:bg-[#f472b6]/10 data-[state=active]:text-[#f472b6] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <MapPin className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Alimentos</span>
             </TabsTrigger>
+            <TabsTrigger value="plan-comidas" className="flex items-center gap-1.5 data-[state=active]:bg-[#a855f7]/10 data-[state=active]:text-[#a855f7] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <UtensilsCrossed className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Plan</span>
+            </TabsTrigger>
             <TabsTrigger value="plan-ia" className="flex items-center gap-1.5 data-[state=active]:bg-[#D4FF00]/10 data-[state=active]:text-[#D4FF00] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <Sparkles className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Plan IA</span>
             </TabsTrigger>
@@ -389,8 +382,23 @@ function ISAKApp() {
             <TabsTrigger value="clientes" className="flex items-center gap-1.5 data-[state=active]:bg-[#6366f1]/10 data-[state=active]:text-[#6366f1] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <Users className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Clientes</span>
             </TabsTrigger>
+            <TabsTrigger value="checkin-cliente" className="flex items-center gap-1.5 data-[state=active]:bg-[#22c55e]/10 data-[state=active]:text-[#22c55e] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <CheckCircle className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{isEn ? 'My Check-in' : 'Mi Check-in'}</span>
+            </TabsTrigger>
+            <TabsTrigger value="checkin-coach" className="flex items-center gap-1.5 data-[state=active]:bg-[#f59e0b]/10 data-[state=active]:text-[#f59e0b] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <BarChart3 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{isEn ? 'Check-ins' : 'Check-ins'}</span>
+            </TabsTrigger>
+            <TabsTrigger value="citas" className="flex items-center gap-1.5 data-[state=active]:bg-[#ec4899]/10 data-[state=active]:text-[#ec4899] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Calendar className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Citas</span>
+            </TabsTrigger>
+            <TabsTrigger value="sueno" className="flex items-center gap-1.5 data-[state=active]:bg-[#6366f1]/10 data-[state=active]:text-[#6366f1] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Moon className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{isEn ? 'Sleep' : 'Sueño'}</span>
+            </TabsTrigger>
             <TabsTrigger value="coach" className="flex items-center gap-1.5 data-[state=active]:bg-[#D4FF00]/10 data-[state=active]:text-[#D4FF00] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <TrendingUp className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Coach</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai-trainer" className="flex items-center gap-1.5 data-[state=active]:bg-[#f59e0b]/10 data-[state=active]:text-[#f59e0b] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Dumbbell className="w-3.5 h-3.5" /> <span className="hidden sm:inline">AI Trainer</span>
             </TabsTrigger>
             <TabsTrigger value="ai-coach" className="flex items-center gap-1.5 data-[state=active]:bg-[#22c55e]/10 data-[state=active]:text-[#22c55e] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <MessageSquare className="w-3.5 h-3.5" /> <span className="hidden sm:inline">AI Coach</span>
@@ -407,26 +415,28 @@ function ISAKApp() {
             <TabsTrigger value="white-label" className="flex items-center gap-1.5 data-[state=active]:bg-[#a78bfa]/10 data-[state=active]:text-[#a78bfa] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
               <Palette className="w-3.5 h-3.5" /> <span className="hidden sm:inline">White-Label</span>
             </TabsTrigger>
+            <TabsTrigger value="biblioteca" className="flex items-center gap-1.5 data-[state=active]:bg-[#22c55e]/10 data-[state=active]:text-[#22c55e] text-xs md:text-sm px-2 md:px-3 py-1.5 rounded-md whitespace-nowrap">
+              <Dumbbell className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{isEn ? 'Exercises' : 'Ejercicios'}</span>
+            </TabsTrigger>
           </TabsList>
 
+          <Suspense fallback={
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <Loader2 className="w-10 h-10 animate-spin text-[#6366f1]" />
+              <p className="text-sm text-gray-400">Cargando contenido...</p>
+            </div>
+          }>
+
+          <TabErrorBoundary tabName="sujeto">
           <TabsContent value="sujeto" className="space-y-4">
             <SujetoForm sujeto={sujeto} onChange={setSujeto} />
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                className="border-[#D4FF00] text-[#D4FF00] hover:bg-[#D4FF00]/10"
-                onClick={handleGuardarPaciente}
-                disabled={createPatient.isPending}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {createPatient.isPending ? 'Guardando...' : 'Guardar Paciente'}
-              </Button>
-            </div>
             <Card className="bg-[#11121a] border-[#1e1f2e] p-6">
               <ChecklistISAK />
             </Card>
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="mediciones">
           <TabsContent value="mediciones" className="space-y-4">
             <MedicionesForm perfilR={perfilR} perfilC={perfilC} nivel={nivel} onChangeR={setPerfilR} onChangeC={setPerfilC} avanzado={medAvanzado} onChangeAvanzado={setMedAvanzado} />
             <div className="flex justify-end gap-3">
@@ -438,11 +448,15 @@ function ISAKApp() {
               </Button>
             </div>
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="etm">
           <TabsContent value="etm" className="space-y-4">
             <ETMPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="resultados">
           <TabsContent value="resultados" className="space-y-4">
             {resultado ? (
               <div className="space-y-6">
@@ -577,7 +591,9 @@ function ISAKApp() {
               </Card>
             )}
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="reporte">
           <TabsContent value="reporte" className="space-y-4">
             {resultado ? (
               <>
@@ -606,12 +622,16 @@ function ISAKApp() {
               </Card>
             )}
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="grupos">
           <TabsContent value="grupos" className="space-y-4">
             <DashboardEquipo />
             <GruposPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="genetico">
           <TabsContent value="genetico" className="space-y-4">
             {resultado?.cincoComponentes ? (
               <PotencialGenetico
@@ -631,71 +651,141 @@ function ISAKApp() {
               </Card>
             )}
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="tracking">
           <TabsContent value="tracking" className="space-y-4">
             <TrackingPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="competencia">
           <TabsContent value="competencia" className="space-y-4">
             <ModoCompetencia />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="nutricion">
           <TabsContent value="nutricion" className="space-y-4">
             <NutricionPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="recetas">
           <TabsContent value="recetas" className="space-y-4">
             <Recetario />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="alimentos">
           <TabsContent value="alimentos" className="space-y-4">
             <AlimentosLATAM />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="plan-comidas">
+          <TabsContent value="plan-comidas" className="space-y-4">
+            <PlanComidas />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="plan-ia">
           <TabsContent value="plan-ia" className="space-y-4">
             <PlanIA />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="periodizacion">
           <TabsContent value="periodizacion" className="space-y-4">
             <PeriodizacionNutricional />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="hidratacion">
           <TabsContent value="hidratacion" className="space-y-4">
             <HidratacionPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="reds">
           <TabsContent value="reds" className="space-y-4">
             <REDSModule />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="wada">
           <TabsContent value="wada" className="space-y-4">
             <WADAVerificador />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="wearables">
           <TabsContent value="wearables" className="space-y-4">
-            <WearableInput />
+            <WearablesPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="clientes">
           <TabsContent value="clientes" className="space-y-4">
             <ClientesPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="checkin-cliente">
+          <TabsContent value="checkin-cliente" className="space-y-4">
+            <ClienteCheckin />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="checkin-coach">
+          <TabsContent value="checkin-coach" className="space-y-4">
+            <CoachCheckins />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="citas">
+          <TabsContent value="citas" className="space-y-4">
+            <CitasPanel />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="sueno">
+          <TabsContent value="sueno" className="space-y-4">
+            <SuenoPanel />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="coach">
           <TabsContent value="coach" className="space-y-4">
             <CoachDashboard />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="ai-trainer">
+          <TabsContent value="ai-trainer" className="space-y-4">
+            <AITrainer />
+          </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="ai-coach">
           <TabsContent value="ai-coach" className="space-y-4">
             <NutriAICoach />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="portal">
           <TabsContent value="portal" className="space-y-4">
             <PortalCliente />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="importar">
           <TabsContent value="importar" className="space-y-4">
             <ImportarExcel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="historial">
           <TabsContent value="historial" className="space-y-4">
             <Card className="p-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -722,14 +812,26 @@ function ISAKApp() {
               )}
             </Card>
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="saas">
           <TabsContent value="saas" className="space-y-4">
             <SaasPanel />
           </TabsContent>
+          </TabErrorBoundary>
 
+          <TabErrorBoundary tabName="white-label">
           <TabsContent value="white-label" className="space-y-4">
             <WhiteLabelPanel />
           </TabsContent>
+          </TabErrorBoundary>
+
+          <TabErrorBoundary tabName="biblioteca">
+          <TabsContent value="biblioteca" className="space-y-4">
+            <BibliotecaEjercicios />
+          </TabsContent>
+          </TabErrorBoundary>
+          </Suspense>
         </Tabs>
       </main>
     </div>
@@ -738,11 +840,15 @@ function ISAKApp() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<ISAKApp />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path="*" element={<ISAKApp />} />
-    </Routes>
+    <GlobalErrorBoundary>
+      <Routes>
+        <Route path="/" element={<TrialGate><ISAKApp /></TrialGate>} />
+        <Route path="/app" element={<TrialGate><ISAKApp /></TrialGate>} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/landing" element={<LandingDemo />} />
+        <Route path="*" element={<TrialGate><ISAKApp /></TrialGate>} />
+      </Routes>
+    </GlobalErrorBoundary>
   );
 }

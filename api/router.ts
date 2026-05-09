@@ -5,6 +5,7 @@ import { evaluacionesRouter } from "./evaluaciones-router";
 import { claudeRouter } from "./claudeRouter";
 import { emailRouter } from "./emailRouter";
 import { checkinRouter } from "./checkinRouter";
+import { wearablesRouter } from "./wearablesRouter";
 import { createRouter, publicQuery } from "./middleware";
 
 export const appRouter = createRouter({
@@ -16,6 +17,7 @@ export const appRouter = createRouter({
   claude: claudeRouter,
   email: emailRouter,
   checkin: checkinRouter,
+  wearables: wearablesRouter,
 });
 
 export type AppRouter = typeof appRouter;

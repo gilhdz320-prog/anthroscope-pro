@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +28,7 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Jitomate rojo', categoria: 'Verduras', pais: 'México', porcion: '1 pieza (120g)', calorias: 22, proteinas: 1.1, carbs: 4.8, grasas: 0.2, fibra: 1.5, ig: 10, equivalente: '1 Verdura', tags: ['basico'] },
   { nombre: 'Tomate verde', categoria: 'Verduras', pais: 'México', porcion: '1 pieza (80g)', calorias: 11, proteinas: 0.5, carbs: 2.3, grasas: 0.1, fibra: 0.9, ig: 10, equivalente: '1 Verdura', tags: ['basico'] },
   { nombre: 'Calabacita italiana', categoria: 'Verduras', pais: 'México', porcion: '1 taza (130g)', calorias: 19, proteinas: 1.5, carbs: 3.5, grasas: 0.2, fibra: 1.5, ig: 10, equivalente: '1 Verdura', tags: ['basico'] },
-  { nombre: 'Flor de calabaza', categoria: 'Verduras', pais: 'México', porcion: '1 taza (100g)', calorias: 15, proteinas: 1.3, carbs: 2.5, grasas: 0.2, fibra: 1.2, ig: 5, equivalente: '1 Verdura', tags: ['basico', 'temporada'] },
+  { nombre: 'Flor  de  calabaza', categoria: 'Verduras', pais: 'México', porcion: '1 taza (100g)', calorias: 15, proteinas: 1.3, carbs: 2.5, grasas: 0.2, fibra: 1.2, ig: 5, equivalente: '1 Verdura', tags: ['basico', 'temporada'] },
   { nombre: 'Huauzontle cocido', categoria: 'Verduras', pais: 'México', porcion: '1 taza (120g)', calorias: 30, proteinas: 3.0, carbs: 4.5, grasas: 0.5, fibra: 3.0, ig: 5, equivalente: '1 Verdura', tags: ['tradicional'] },
   { nombre: 'Quelites cocidos', categoria: 'Verduras', pais: 'México', porcion: '1 taza (100g)', calorias: 32, proteinas: 3.2, carbs: 4.0, grasas: 0.5, fibra: 2.8, ig: 5, equivalente: '1 Verdura', tags: ['tradicional', 'superfood'] },
   { nombre: 'Epazote fresco', categoria: 'Verduras', pais: 'México', porcion: '1/2 taza (10g)', calorias: 6, proteinas: 0.4, carbs: 1.0, grasas: 0.1, fibra: 0.7, ig: 5, equivalente: 'Libre', tags: ['basico', 'aromatica'] },
@@ -47,7 +48,7 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Apio crudo', categoria: 'Verduras', pais: 'México', porcion: '2 tallos (80g)', calorias: 13, proteinas: 0.6, carbs: 2.4, grasas: 0.2, fibra: 1.3, ig: 5, equivalente: 'Libre', tags: ['basico', 'keto'] },
   { nombre: 'Pepino crudo', categoria: 'Verduras', pais: 'México', porcion: '1 taza (100g)', calorias: 16, proteinas: 0.7, carbs: 3.8, grasas: 0.1, fibra: 0.5, ig: 10, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Champinones cocidos', categoria: 'Verduras', pais: 'México', porcion: '1 taza (155g)', calorias: 44, proteinas: 3.6, carbs: 6.6, grasas: 0.7, fibra: 2.7, ig: 5, equivalente: '1 Verdura', tags: ['basico', 'keto'] },
-  { nombre: 'Palitos de zanahoria', categoria: 'Verduras', pais: 'México', porcion: '1/2 taza (60g)', calorias: 25, proteinas: 0.6, carbs: 6.0, grasas: 0.1, fibra: 1.7, ig: 47, equivalente: '1/2 Verdura', tags: ['basico', 'colacion'] },
+  { nombre: 'Palitos  de  zanahoria', categoria: 'Verduras', pais: 'México', porcion: '1/2 taza (60g)', calorias: 25, proteinas: 0.6, carbs: 6.0, grasas: 0.1, fibra: 1.7, ig: 47, equivalente: '1/2 Verdura', tags: ['basico', 'colacion'] },
   { nombre: 'Alcachofa cocida', categoria: 'Verduras', pais: 'España', porcion: '1 pieza (120g)', calorias: 60, proteinas: 4.2, carbs: 13.4, grasas: 0.2, fibra: 6.8, ig: 5, equivalente: '1 Verdura', tags: ['basico', 'superfood'] },
   { nombre: 'Esparragos cocidos', categoria: 'Verduras', pais: 'Perú', porcion: '1/2 taza (90g)', calorias: 40, proteinas: 4.3, carbs: 7.4, grasas: 0.4, fibra: 3.0, ig: 5, equivalente: '1 Verdura', tags: ['basico', 'superfood'] },
   { nombre: 'Calabaza (ayote) cocida', categoria: 'Verduras', pais: 'Centroamérica', porcion: '1 taza (120g)', calorias: 49, proteinas: 2.0, carbs: 12.0, grasas: 0.2, fibra: 2.8, ig: 65, equivalente: '1 Verdura', tags: ['basico'] },
@@ -93,48 +94,48 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Maracuya (parcha)', categoria: 'Frutas', pais: 'Colombia', porcion: '1/2 taza (100g)', calorias: 60, proteinas: 2.0, carbs: 12.0, grasas: 1.0, fibra: 8.0, ig: 5, equivalente: '1 Fruta', tags: ['basico'] },
   { nombre: 'Acai pulp', categoria: 'Frutas', pais: 'Brasil', porcion: '100g', calorias: 70, proteinas: 1.0, carbs: 6.0, grasas: 5.0, fibra: 3.0, ig: 5, equivalente: '1 Fruta + 1 Grasa', tags: ['superfood', 'pre-entreno'] },
   { nombre: 'Caju (fruta)', categoria: 'Frutas', pais: 'Brasil', porcion: '1 taza (100g)', calorias: 43, proteinas: 1.0, carbs: 9.2, grasas: 0.3, fibra: 0.8, ig: 5, equivalente: '1/2 Fruta', tags: ['tradicional'] },
-  { nombre: 'Tortilla de maiz', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (25g)', calorias: 62, proteinas: 1.5, carbs: 13.0, grasas: 0.6, fibra: 1.5, ig: 52, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
-  { nombre: 'Tortilla de harina', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (35g)', calorias: 100, proteinas: 2.5, carbs: 17.0, grasas: 2.5, fibra: 0.8, ig: 65, equivalente: '1 Cereal c/g', tags: ['basico'] },
+  { nombre: 'Tortilla  de  maiz', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (25g)', calorias: 62, proteinas: 1.5, carbs: 13.0, grasas: 0.6, fibra: 1.5, ig: 52, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
+  { nombre: 'Tortilla  de  harina', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (35g)', calorias: 100, proteinas: 2.5, carbs: 17.0, grasas: 2.5, fibra: 0.8, ig: 65, equivalente: '1 Cereal c/g', tags: ['basico'] },
   { nombre: 'Tortilla integral', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (30g)', calorias: 85, proteinas: 2.8, carbs: 15.0, grasas: 1.5, fibra: 2.5, ig: 45, equivalente: '1 Cereal c/g', tags: ['basico'] },
-  { nombre: 'Masa de maiz nixtamal', categoria: 'Cereales', pais: 'México', porcion: '50g', calorias: 110, proteinas: 2.0, carbs: 23.0, grasas: 1.0, fibra: 2.0, ig: 52, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
+  { nombre: 'Masa  de  maiz nixtamal', categoria: 'Cereales', pais: 'México', porcion: '50g', calorias: 110, proteinas: 2.0, carbs: 23.0, grasas: 1.0, fibra: 2.0, ig: 52, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
   { nombre: 'Elote desgranado cocido', categoria: 'Cereales', pais: 'México', porcion: '1 taza (165g)', calorias: 132, proteinas: 4.7, carbs: 29.0, grasas: 1.2, fibra: 3.8, ig: 55, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Esquites (elote en vaso)', categoria: 'Cereales', pais: 'México', porcion: '1 vaso (200g)', calorias: 180, proteinas: 6.0, carbs: 35.0, grasas: 3.0, fibra: 5.0, ig: 55, equivalente: '1.5 Cereales s/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
-  { nombre: 'Tostada de maiz', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (15g)', calorias: 45, proteinas: 0.8, carbs: 9.0, grasas: 0.5, fibra: 1.0, ig: 52, equivalente: '1/2 Cereal s/g', tags: ['basico', 'gluten-free'] },
+  { nombre: 'Tostada  de  maiz', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (15g)', calorias: 45, proteinas: 0.8, carbs: 9.0, grasas: 0.5, fibra: 1.0, ig: 52, equivalente: '1/2 Cereal s/g', tags: ['basico', 'gluten-free'] },
   { nombre: 'Totopo horneado', categoria: 'Cereales', pais: 'México', porcion: '10 piezas (30g)', calorias: 130, proteinas: 2.0, carbs: 24.0, grasas: 3.0, fibra: 2.0, ig: 60, equivalente: '1.5 Cereales s/g', tags: ['basico'] },
-  { nombre: 'Pan blanco de caja', categoria: 'Cereales', pais: 'México', porcion: '1 rebanada (30g)', calorias: 80, proteinas: 2.5, carbs: 15.0, grasas: 1.0, fibra: 0.8, ig: 70, equivalente: '1 Cereal s/g', tags: ['basico'] },
+  { nombre: 'Pan blanco  de  caja', categoria: 'Cereales', pais: 'México', porcion: '1 rebanada (30g)', calorias: 80, proteinas: 2.5, carbs: 15.0, grasas: 1.0, fibra: 0.8, ig: 70, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Pan integral Bimbo', categoria: 'Cereales', pais: 'México', porcion: '1 rebanada (33g)', calorias: 85, proteinas: 3.5, carbs: 15.0, grasas: 1.5, fibra: 2.5, ig: 50, equivalente: '1 Cereal c/g', tags: ['basico'] },
-  { nombre: 'Pan de caja multigrano', categoria: 'Cereales', pais: 'México', porcion: '1 rebanada (35g)', calorias: 90, proteinas: 4.0, carbs: 16.0, grasas: 1.5, fibra: 3.0, ig: 45, equivalente: '1 Cereal c/g', tags: ['basico', 'superfood'] },
+  { nombre: 'Pan  de  caja multigrano', categoria: 'Cereales', pais: 'México', porcion: '1 rebanada (35g)', calorias: 90, proteinas: 4.0, carbs: 16.0, grasas: 1.5, fibra: 3.0, ig: 45, equivalente: '1 Cereal c/g', tags: ['basico', 'superfood'] },
   { nombre: 'Bolillo sin migajon', categoria: 'Cereales', pais: 'México', porcion: '1/2 pieza (30g)', calorias: 82, proteinas: 2.6, carbs: 16.5, grasas: 0.8, fibra: 0.7, ig: 70, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Bolillo integral', categoria: 'Cereales', pais: 'México', porcion: '1/2 pieza (32g)', calorias: 85, proteinas: 3.0, carbs: 16.0, grasas: 1.2, fibra: 2.0, ig: 55, equivalente: '1 Cereal c/g', tags: ['basico'] },
   { nombre: 'Telera', categoria: 'Cereales', pais: 'México', porcion: '1/2 pieza (35g)', calorias: 95, proteinas: 3.0, carbs: 18.0, grasas: 1.2, fibra: 0.8, ig: 70, equivalente: '1 Cereal c/g', tags: ['basico'] },
   { nombre: 'Concha (pan dulce)', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (55g)', calorias: 200, proteinas: 4.5, carbs: 35.0, grasas: 5.0, fibra: 1.5, ig: 70, equivalente: '2 Cereales c/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Cuernito (croissant)', categoria: 'Cereales', pais: 'México', porcion: '1 pieza (45g)', calorias: 180, proteinas: 3.5, carbs: 20.0, grasas: 9.0, fibra: 1.0, ig: 70, equivalente: '1 Cereal c/g + 1.5 Grasas', tags: ['tradicional'] },
   { nombre: 'Galleta Maria', categoria: 'Cereales', pais: 'México', porcion: '3 piezas (15g)', calorias: 70, proteinas: 1.2, carbs: 12.0, grasas: 2.0, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
-  { nombre: 'Galleta de animalitos', categoria: 'Cereales', pais: 'México', porcion: '10 piezas (20g)', calorias: 90, proteinas: 1.5, carbs: 14.0, grasas: 3.0, fibra: 0.5, ig: 75, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
+  { nombre: 'Galleta  de  animalitos', categoria: 'Cereales', pais: 'México', porcion: '10 piezas (20g)', calorias: 90, proteinas: 1.5, carbs: 14.0, grasas: 3.0, fibra: 0.5, ig: 75, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
   { nombre: 'Saladitas Gamesa', categoria: 'Cereales', pais: 'México', porcion: '3 piezas (15g)', calorias: 70, proteinas: 1.0, carbs: 10.0, grasas: 2.5, fibra: 0.3, ig: 75, equivalente: '1/2 Cereal c/g', tags: ['basico'] },
   { nombre: 'Arroz blanco cocido', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (80g)', calorias: 100, proteinas: 2.0, carbs: 22.0, grasas: 0.2, fibra: 0.3, ig: 73, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Arroz integral cocido', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (80g)', calorias: 108, proteinas: 2.5, carbs: 22.5, grasas: 0.9, fibra: 1.8, ig: 50, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood'] },
   { nombre: 'Pasta sopa cocida', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (70g)', calorias: 95, proteinas: 3.2, carbs: 19.0, grasas: 0.4, fibra: 0.8, ig: 45, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Pasta integral cocida', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (70g)', calorias: 100, proteinas: 3.5, carbs: 19.0, grasas: 0.6, fibra: 2.5, ig: 42, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Fideo seco cocido', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (70g)', calorias: 95, proteinas: 3.2, carbs: 19.0, grasas: 0.3, fibra: 0.8, ig: 45, equivalente: '1 Cereal s/g', tags: ['basico'] },
-  { nombre: 'Sopa de arroz con fideo', categoria: 'Cereales', pais: 'México', porcion: '1 taza (250ml)', calorias: 120, proteinas: 3.0, carbs: 24.0, grasas: 1.0, fibra: 0.8, ig: 70, equivalente: '1 Cereal s/g', tags: ['basico', 'sopa'] },
+  { nombre: 'Sopa  de  arroz con fideo', categoria: 'Cereales', pais: 'México', porcion: '1 taza (250ml)', calorias: 120, proteinas: 3.0, carbs: 24.0, grasas: 1.0, fibra: 0.8, ig: 70, equivalente: '1 Cereal s/g', tags: ['basico', 'sopa'] },
   { nombre: 'Avena en hojuelas cruda', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (40g)', calorias: 150, proteinas: 5.2, carbs: 27.0, grasas: 2.6, fibra: 4.0, ig: 42, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood'] },
   { nombre: 'Avena cocida', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (120g)', calorias: 83, proteinas: 2.9, carbs: 14.0, grasas: 1.4, fibra: 2.0, ig: 42, equivalente: '1/2 Cereal s/g', tags: ['basico', 'desayuno'] },
-  { nombre: 'Harina de avena', categoria: 'Cereales', pais: 'México', porcion: '3 cdas (30g)', calorias: 116, proteinas: 4.0, carbs: 20.0, grasas: 2.4, fibra: 3.0, ig: 42, equivalente: '1 Cereal s/g', tags: ['basico'] },
+  { nombre: 'Harina  de  avena', categoria: 'Cereales', pais: 'México', porcion: '3 cdas (30g)', calorias: 116, proteinas: 4.0, carbs: 20.0, grasas: 2.4, fibra: 3.0, ig: 42, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Amaranto tostado', categoria: 'Cereales', pais: 'México', porcion: '1/4 taza (20g)', calorias: 78, proteinas: 2.8, carbs: 14.0, grasas: 1.4, fibra: 2.0, ig: 35, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood', 'gluten-free'] },
-  { nombre: 'Hojuelas de amaranto', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (30g)', calorias: 107, proteinas: 3.7, carbs: 19.0, grasas: 1.9, fibra: 2.5, ig: 35, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood'] },
+  { nombre: 'Hojuelas  de  amaranto', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (30g)', calorias: 107, proteinas: 3.7, carbs: 19.0, grasas: 1.9, fibra: 2.5, ig: 35, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood'] },
   { nombre: 'Quinoa cocida', categoria: 'Cereales', pais: 'Perú', porcion: '1/2 taza (90g)', calorias: 111, proteinas: 4.0, carbs: 20.0, grasas: 1.8, fibra: 2.8, ig: 53, equivalente: '1 Cereal s/g', tags: ['basico', 'superfood', 'gluten-free'] },
   { nombre: 'Cuscus cocido', categoria: 'Cereales', pais: 'Mediterráneo', porcion: '1/2 taza (80g)', calorias: 88, proteinas: 3.0, carbs: 18.0, grasas: 0.2, fibra: 1.2, ig: 65, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Cebada cocida', categoria: 'Cereales', pais: 'México', porcion: '1/2 taza (80g)', calorias: 97, proteinas: 1.8, carbs: 22.0, grasas: 0.3, fibra: 3.0, ig: 30, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Granola casera', categoria: 'Cereales', pais: 'México', porcion: '1/4 taza (30g)', calorias: 140, proteinas: 3.5, carbs: 20.0, grasas: 5.5, fibra: 2.5, ig: 50, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['basico', 'desayuno'] },
-  { nombre: 'Cereal de caja (corn flakes)', categoria: 'Cereales', pais: 'México', porcion: '1 taza (30g)', calorias: 110, proteinas: 2.0, carbs: 24.0, grasas: 0.2, fibra: 0.5, ig: 85, equivalente: '1 Cereal s/g', tags: ['basico', 'desayuno'] },
-  { nombre: 'Cereal de hojuelas integrales', categoria: 'Cereales', pais: 'México', porcion: '1 taza (40g)', calorias: 130, proteinas: 3.5, carbs: 28.0, grasas: 1.0, fibra: 4.0, ig: 50, equivalente: '1 Cereal s/g', tags: ['basico', 'desayuno'] },
+  { nombre: 'Cereal  de  caja (corn flakes)', categoria: 'Cereales', pais: 'México', porcion: '1 taza (30g)', calorias: 110, proteinas: 2.0, carbs: 24.0, grasas: 0.2, fibra: 0.5, ig: 85, equivalente: '1 Cereal s/g', tags: ['basico', 'desayuno'] },
+  { nombre: 'Cereal  de  hojuelas integrales', categoria: 'Cereales', pais: 'México', porcion: '1 taza (40g)', calorias: 130, proteinas: 3.5, carbs: 28.0, grasas: 1.0, fibra: 4.0, ig: 50, equivalente: '1 Cereal s/g', tags: ['basico', 'desayuno'] },
   { nombre: 'Tapioca cocida', categoria: 'Cereales', pais: 'Brasil', porcion: '1/2 taza (75g)', calorias: 75, proteinas: 0.0, carbs: 18.8, grasas: 0.0, fibra: 0.0, ig: 70, equivalente: '1/2 Cereal s/g', tags: ['gluten-free', 'basico'] },
   { nombre: 'Arepa colombiana', categoria: 'Cereales', pais: 'Colombia', porcion: '1 pieza (60g)', calorias: 150, proteinas: 2.0, carbs: 32.0, grasas: 1.0, fibra: 0.5, ig: 70, equivalente: '1.5 Cereales s/g', tags: ['basico', 'gluten-free'] },
   { nombre: 'Arepa venezolana', categoria: 'Cereales', pais: 'Venezuela', porcion: '1 pieza (80g)', calorias: 200, proteinas: 3.0, carbs: 42.0, grasas: 1.0, fibra: 0.8, ig: 70, equivalente: '2 Cereales s/g', tags: ['basico', 'gluten-free'] },
   { nombre: 'Cachapa venezolana', categoria: 'Cereales', pais: 'Venezuela', porcion: '1 pieza (100g)', calorias: 200, proteinas: 4.0, carbs: 35.0, grasas: 5.0, fibra: 2.0, ig: 55, equivalente: '1.5 Cereales c/g', tags: ['tradicional'] },
-  { nombre: 'Pao de queijo', categoria: 'Cereales', pais: 'Brasil', porcion: '2 piezas (30g)', calorias: 100, proteinas: 1.8, carbs: 12.0, grasas: 4.5, fibra: 0.5, ig: 70, equivalente: '1/2 Cereal c/g + 1 Grasa', tags: ['gluten-free', 'desayuno'] },
-  { nombre: 'Pan de pita integral', categoria: 'Cereales', pais: 'Mediterráneo', porcion: '1 pieza (30g)', calorias: 80, proteinas: 3.0, carbs: 16.0, grasas: 1.0, fibra: 2.5, ig: 57, equivalente: '1 Cereal s/g', tags: ['basico'] },
+  { nombre: 'Pao  de  queijo', categoria: 'Cereales', pais: 'Brasil', porcion: '2 piezas (30g)', calorias: 100, proteinas: 1.8, carbs: 12.0, grasas: 4.5, fibra: 0.5, ig: 70, equivalente: '1/2 Cereal c/g + 1 Grasa', tags: ['gluten-free', 'desayuno'] },
+  { nombre: 'Pan  de  pita integral', categoria: 'Cereales', pais: 'Mediterráneo', porcion: '1 pieza (30g)', calorias: 80, proteinas: 3.0, carbs: 16.0, grasas: 1.0, fibra: 2.5, ig: 57, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Pan arabe integral', categoria: 'Cereales', pais: 'México', porcion: '1/2 pieza (30g)', calorias: 82, proteinas: 2.8, carbs: 16.0, grasas: 1.0, fibra: 2.2, ig: 55, equivalente: '1 Cereal s/g', tags: ['basico'] },
   { nombre: 'Cream cracker', categoria: 'Cereales', pais: 'México', porcion: '3 piezas (15g)', calorias: 72, proteinas: 1.2, carbs: 11.0, grasas: 2.5, fibra: 0.3, ig: 75, equivalente: '1/2 Cereal c/g', tags: ['basico'] },
   { nombre: 'Frijol negro cocido', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 114, proteinas: 7.6, carbs: 20.0, grasas: 0.5, fibra: 7.5, ig: 30, equivalente: '1 Leguminosa', tags: ['basico', 'vegetariano', 'gluten-free'] },
@@ -150,38 +151,38 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Edamames cocidos', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (75g)', calorias: 127, proteinas: 11.0, carbs: 10.0, grasas: 5.8, fibra: 4.0, ig: 18, equivalente: '1 Leguminosa + 1/2 Grasa', tags: ['basico', 'superfood'] },
   { nombre: 'Habas cocidas', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 94, proteinas: 6.5, carbs: 16.3, grasas: 0.3, fibra: 4.5, ig: 30, equivalente: '1 Leguminosa', tags: ['basico', 'vegetariano'] },
   { nombre: 'Soya cocida', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 149, proteinas: 16.6, carbs: 8.5, grasas: 7.7, fibra: 5.2, ig: 15, equivalente: '1 Leguminosa + 1 Grasa', tags: ['basico', 'superfood'] },
-  { nombre: 'Texturizado de soya (hidr)', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (50g)', calorias: 80, proteinas: 10.0, carbs: 6.0, grasas: 2.0, fibra: 4.0, ig: 15, equivalente: '1 Leguminosa', tags: ['vegetariano'] },
+  { nombre: 'Texturizado  de  soya (hidr)', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (50g)', calorias: 80, proteinas: 10.0, carbs: 6.0, grasas: 2.0, fibra: 4.0, ig: 15, equivalente: '1 Leguminosa', tags: ['vegetariano'] },
   { nombre: 'Tofu firme', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (125g)', calorias: 94, proteinas: 10.0, carbs: 2.3, grasas: 5.7, fibra: 1.0, ig: 15, equivalente: '1 Carne magra', tags: ['vegetariano', 'superfood'] },
   { nombre: 'Tempeh', categoria: 'Leguminosas', pais: 'Indonesia', porcion: '1/2 taza (80g)', calorias: 160, proteinas: 16.0, carbs: 8.0, grasas: 8.0, fibra: 5.0, ig: 15, equivalente: '1 Carne magra + 1 Grasa', tags: ['vegetariano', 'fermentado'] },
   { nombre: 'Hummus (garbanzo)', categoria: 'Leguminosas', pais: 'Mediterráneo', porcion: '3 cdas (45g)', calorias: 70, proteinas: 2.5, carbs: 5.0, grasas: 4.5, fibra: 2.0, ig: 28, equivalente: '1/2 Leguminosa + 1 Grasa', tags: ['vegetariano', 'colacion'] },
   { nombre: 'Frijol blanco cocido', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 110, proteinas: 7.3, carbs: 19.5, grasas: 0.4, fibra: 6.3, ig: 30, equivalente: '1 Leguminosa', tags: ['basico', 'vegetariano'] },
-  { nombre: 'Frijol flor de mayo cocido', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 112, proteinas: 7.0, carbs: 20.0, grasas: 0.4, fibra: 7.0, ig: 30, equivalente: '1 Leguminosa', tags: ['basico'] },
+  { nombre: 'Frijol flor  de  mayo cocido', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 112, proteinas: 7.0, carbs: 20.0, grasas: 0.4, fibra: 7.0, ig: 30, equivalente: '1 Leguminosa', tags: ['basico'] },
   { nombre: 'Frijol negro enlatado (escurrido)', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 109, proteinas: 7.3, carbs: 19.5, grasas: 0.4, fibra: 7.5, ig: 30, equivalente: '1 Leguminosa', tags: ['basico'] },
   { nombre: 'Alubias rojas cocidas', categoria: 'Leguminosas', pais: 'México', porcion: '1/2 taza (85g)', calorias: 112, proteinas: 6.7, carbs: 20.0, grasas: 0.4, fibra: 6.4, ig: 30, equivalente: '1 Leguminosa', tags: ['basico'] },
   { nombre: 'Fava beans cocidas', categoria: 'Leguminosas', pais: 'Egipto', porcion: '1/2 taza (85g)', calorias: 95, proteinas: 6.5, carbs: 16.3, grasas: 0.4, fibra: 4.5, ig: 40, equivalente: '1 Leguminosa', tags: ['basico'] },
   { nombre: 'Lupino cocido', categoria: 'Leguminosas', pais: 'Andes', porcion: '1/2 taza (85g)', calorias: 100, proteinas: 12.0, carbs: 10.0, grasas: 2.5, fibra: 4.5, ig: 15, equivalente: '1 Leguminosa + 1/2 Grasa', tags: ['basico', 'superfood'] },
   { nombre: 'Peas amarillo partido cocido', categoria: 'Leguminosas', pais: 'India', porcion: '1/2 taza (85g)', calorias: 110, proteinas: 8.0, carbs: 19.0, grasas: 0.5, fibra: 7.0, ig: 30, equivalente: '1 Leguminosa', tags: ['basico', 'vegetariano'] },
   { nombre: 'Urd dal cocido', categoria: 'Leguminosas', pais: 'India', porcion: '1/2 taza (85g)', calorias: 100, proteinas: 7.0, carbs: 17.0, grasas: 0.4, fibra: 6.0, ig: 30, equivalente: '1 Leguminosa', tags: ['basico', 'vegetariano'] },
-  { nombre: 'Pechuga de pollo cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 165, proteinas: 31.0, carbs: 0.0, grasas: 3.6, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
-  { nombre: 'Muslo de pollo sin piel cocido', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 161, proteinas: 26.0, carbs: 0.0, grasas: 6.3, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico'] },
-  { nombre: 'Pierna de pollo con piel cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 191, proteinas: 23.0, carbs: 0.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico'] },
-  { nombre: 'Carne de res molida 90/10', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 176, proteinas: 26.0, carbs: 0.0, grasas: 10.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico', 'keto'] },
-  { nombre: 'Carne de res molida 95/5', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 137, proteinas: 26.0, carbs: 0.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
-  { nombre: 'Bistec de res magro', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 154, proteinas: 26.0, carbs: 0.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
+  { nombre: 'Pechuga  de  pollo cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 165, proteinas: 31.0, carbs: 0.0, grasas: 3.6, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
+  { nombre: 'Muslo  de  pollo sin piel cocido', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 161, proteinas: 26.0, carbs: 0.0, grasas: 6.3, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico'] },
+  { nombre: 'Pierna  de  pollo con piel cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 191, proteinas: 23.0, carbs: 0.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico'] },
+  { nombre: 'Carne  de  res molida 90/10', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 176, proteinas: 26.0, carbs: 0.0, grasas: 10.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico', 'keto'] },
+  { nombre: 'Carne  de  res molida 95/5', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 137, proteinas: 26.0, carbs: 0.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
+  { nombre: 'Bistec  de  res magro', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 154, proteinas: 26.0, carbs: 0.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
   { nombre: 'Arrachera', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 250, proteinas: 18.0, carbs: 0.0, grasas: 20.0, fibra: 0.0, ig: 0, equivalente: '1 Carne grasa', tags: ['tradicional'] },
-  { nombre: 'Cecina de res', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 180, proteinas: 28.0, carbs: 0.0, grasas: 7.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['tradicional'] },
+  { nombre: 'Cecina  de  res', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 180, proteinas: 28.0, carbs: 0.0, grasas: 7.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['tradicional'] },
   { nombre: 'Carne seca (machaca)', categoria: 'Proteinas', pais: 'México', porcion: '30g', calorias: 90, proteinas: 15.0, carbs: 0.0, grasas: 3.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['tradicional'] },
   { nombre: 'Suadero cocido', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 310, proteinas: 14.0, carbs: 0.0, grasas: 28.0, fibra: 0.0, ig: 0, equivalente: '1 Carne grasa', tags: ['tradicional'] },
-  { nombre: 'Lengua de res cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 284, proteinas: 19.0, carbs: 0.0, grasas: 22.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['tradicional'] },
+  { nombre: 'Lengua  de  res cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 284, proteinas: 19.0, carbs: 0.0, grasas: 22.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['tradicional'] },
   { nombre: 'Tripa (panza) cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 85, proteinas: 12.0, carbs: 0.0, grasas: 3.7, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['tradicional'] },
-  { nombre: 'Chicharron de cerdo', categoria: 'Proteinas', pais: 'México', porcion: '20g (1 puño)', calorias: 110, proteinas: 7.0, carbs: 0.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional', 'keto'] },
-  { nombre: 'Pechuga de pavo', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 135, proteinas: 30.0, carbs: 0.0, grasas: 1.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
-  { nombre: 'Milanesa de pollo empanizada', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (100g)', calorias: 250, proteinas: 18.0, carbs: 15.0, grasas: 13.0, fibra: 0.8, ig: 50, equivalente: '1 Carne magra + 1 Cereal c/g', tags: ['basico'] },
-  { nombre: 'Milanesa de res empanizada', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (100g)', calorias: 260, proteinas: 16.0, carbs: 14.0, grasas: 14.0, fibra: 0.8, ig: 50, equivalente: '1 Carne semigrasa + 1 Cereal c/g', tags: ['basico'] },
-  { nombre: 'Salchicha de pollo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 180, proteinas: 10.0, carbs: 4.0, grasas: 14.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa + 1 Grasa', tags: ['basico'] },
-  { nombre: 'Salchicha de pavo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 140, proteinas: 12.0, carbs: 3.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1/2 Grasa', tags: ['basico'] },
-  { nombre: 'Jamon de pavo', categoria: 'Proteinas', pais: 'México', porcion: '2 rebanadas (60g)', calorias: 60, proteinas: 10.0, carbs: 2.0, grasas: 1.5, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico'] },
-  { nombre: 'Jamon de pierna', categoria: 'Proteinas', pais: 'México', porcion: '2 rebanadas (60g)', calorias: 80, proteinas: 8.0, carbs: 2.0, grasas: 4.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico'] },
+  { nombre: 'Chicharron  de  cerdo', categoria: 'Proteinas', pais: 'México', porcion: '20g (1 puño)', calorias: 110, proteinas: 7.0, carbs: 0.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional', 'keto'] },
+  { nombre: 'Pechuga  de  pavo', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 135, proteinas: 30.0, carbs: 0.0, grasas: 1.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
+  { nombre: 'Milanesa  de  pollo empanizada', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (100g)', calorias: 250, proteinas: 18.0, carbs: 15.0, grasas: 13.0, fibra: 0.8, ig: 50, equivalente: '1 Carne magra + 1 Cereal c/g', tags: ['basico'] },
+  { nombre: 'Milanesa  de  res empanizada', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (100g)', calorias: 260, proteinas: 16.0, carbs: 14.0, grasas: 14.0, fibra: 0.8, ig: 50, equivalente: '1 Carne semigrasa + 1 Cereal c/g', tags: ['basico'] },
+  { nombre: 'Salchicha  de  pollo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 180, proteinas: 10.0, carbs: 4.0, grasas: 14.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa + 1 Grasa', tags: ['basico'] },
+  { nombre: 'Salchicha  de  pavo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 140, proteinas: 12.0, carbs: 3.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1/2 Grasa', tags: ['basico'] },
+  { nombre: 'Jamon  de  pavo', categoria: 'Proteinas', pais: 'México', porcion: '2 rebanadas (60g)', calorias: 60, proteinas: 10.0, carbs: 2.0, grasas: 1.5, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico'] },
+  { nombre: 'Jamon  de  pierna', categoria: 'Proteinas', pais: 'México', porcion: '2 rebanadas (60g)', calorias: 80, proteinas: 8.0, carbs: 2.0, grasas: 4.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico'] },
   { nombre: 'Tocino', categoria: 'Proteinas', pais: 'México', porcion: '2 rebanadas (30g)', calorias: 130, proteinas: 7.0, carbs: 0.5, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['basico', 'keto'] },
   { nombre: 'Atun en agua (lata)', categoria: 'Proteinas', pais: 'México', porcion: '1 lata (140g)', calorias: 120, proteinas: 26.0, carbs: 0.0, grasas: 1.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'superfood'] },
   { nombre: 'Atun en aceite (lata)', categoria: 'Proteinas', pais: 'México', porcion: '1 lata (140g)', calorias: 200, proteinas: 26.0, carbs: 0.0, grasas: 8.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1.5 Grasas', tags: ['basico'] },
@@ -191,16 +192,16 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Trucha arcoiris cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 168, proteinas: 23.5, carbs: 0.0, grasas: 7.5, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['basico', 'superfood'] },
   { nombre: 'Mojarra frita', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (100g)', calorias: 220, proteinas: 18.0, carbs: 8.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Cereal c/g', tags: ['tradicional'] },
   { nombre: 'Camaron cocido', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 99, proteinas: 24.0, carbs: 0.2, grasas: 0.3, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
-  { nombre: 'Ceviche de pescado', categoria: 'Proteinas', pais: 'Perú', porcion: '1 taza (200g)', calorias: 140, proteinas: 22.0, carbs: 6.0, grasas: 3.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1/2 Verdura', tags: ['tradicional', 'superfood'] },
+  { nombre: 'Ceviche  de  pescado', categoria: 'Proteinas', pais: 'Perú', porcion: '1 taza (200g)', calorias: 140, proteinas: 22.0, carbs: 6.0, grasas: 3.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1/2 Verdura', tags: ['tradicional', 'superfood'] },
   { nombre: 'Huachinango cocido', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 108, proteinas: 22.0, carbs: 0.0, grasas: 2.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['tradicional', 'superfood'] },
   { nombre: 'Sierra fileteada cocida', categoria: 'Proteinas', pais: 'México', porcion: '100g', calorias: 130, proteinas: 20.0, carbs: 0.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico'] },
   { nombre: 'Huevo entero cocido', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (50g)', calorias: 72, proteinas: 6.3, carbs: 0.6, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
-  { nombre: 'Clara de huevo cocida', categoria: 'Proteinas', pais: 'México', porcion: '2 claras (66g)', calorias: 34, proteinas: 7.2, carbs: 0.4, grasas: 0.1, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
+  { nombre: 'Clara  de  huevo cocida', categoria: 'Proteinas', pais: 'México', porcion: '2 claras (66g)', calorias: 34, proteinas: 7.2, carbs: 0.4, grasas: 0.1, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'keto'] },
   { nombre: 'Huevo revuelto', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (50g)', calorias: 90, proteinas: 6.0, carbs: 1.0, grasas: 7.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1/2 Grasa', tags: ['basico'] },
-  { nombre: 'Tortilla de huevo', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (80g)', calorias: 150, proteinas: 8.0, carbs: 2.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['basico', 'desayuno'] },
+  { nombre: 'Tortilla  de  huevo', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (80g)', calorias: 150, proteinas: 8.0, carbs: 2.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['basico', 'desayuno'] },
   { nombre: 'Huevo estrellado', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (50g)', calorias: 80, proteinas: 6.3, carbs: 0.6, grasas: 5.5, fibra: 0.0, ig: 0, equivalente: '1 Carne magra', tags: ['basico', 'desayuno'] },
-  { nombre: 'Sobao de huevo', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (60g)', calorias: 180, proteinas: 10.0, carbs: 8.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional'] },
-  { nombre: 'Longaniza de pollo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 170, proteinas: 13.0, carbs: 3.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional'] },
+  { nombre: 'Sobao  de  huevo', categoria: 'Proteinas', pais: 'México', porcion: '1 pieza (60g)', calorias: 180, proteinas: 10.0, carbs: 8.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional'] },
+  { nombre: 'Longaniza  de  pollo', categoria: 'Proteinas', pais: 'México', porcion: '2 piezas (80g)', calorias: 170, proteinas: 13.0, carbs: 3.0, grasas: 12.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional'] },
   { nombre: 'Chorizo argentino', categoria: 'Proteinas', pais: 'Argentina', porcion: '50g', calorias: 230, proteinas: 10.0, carbs: 2.0, grasas: 20.0, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa + 2 Grasas', tags: ['tradicional'] },
   { nombre: 'Morcilla (moronga)', categoria: 'Proteinas', pais: 'México', porcion: '50g', calorias: 150, proteinas: 7.0, carbs: 8.0, grasas: 10.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional'] },
   { nombre: 'Pato cocido', categoria: 'Proteinas', pais: 'Perú', porcion: '100g', calorias: 201, proteinas: 23.5, carbs: 0.0, grasas: 11.4, fibra: 0.0, ig: 0, equivalente: '1 Carne semigrasa', tags: ['tradicional'] },
@@ -228,19 +229,19 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Crema para batir', categoria: 'Lacteos', pais: 'México', porcion: '2 cdas (30g)', calorias: 100, proteinas: 0.5, carbs: 1.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '2 Grasas', tags: ['basico'] },
   { nombre: 'Mantequilla', categoria: 'Lacteos', pais: 'México', porcion: '1 cda (14g)', calorias: 100, proteinas: 0.0, carbs: 0.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '2 Grasas', tags: ['basico', 'keto'] },
   { nombre: 'Margarina vegetal', categoria: 'Lacteos', pais: 'México', porcion: '1 cda (14g)', calorias: 100, proteinas: 0.0, carbs: 0.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '2 Grasas', tags: ['basico'] },
-  { nombre: 'Leche de almendra sin azucar', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 30, proteinas: 1.0, carbs: 1.0, grasas: 2.5, fibra: 0.5, ig: 5, equivalente: 'Libre', tags: ['vegetariano', 'keto'] },
-  { nombre: 'Leche de coco bebible', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 45, proteinas: 0.5, carbs: 2.0, grasas: 4.5, fibra: 0.0, ig: 5, equivalente: '1 Grasa', tags: ['vegetariano', 'keto'] },
-  { nombre: 'Leche de soya', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 80, proteinas: 7.0, carbs: 4.0, grasas: 3.5, fibra: 1.0, ig: 30, equivalente: '1 Leche semi', tags: ['vegetariano'] },
+  { nombre: 'Leche  de  almendra sin azucar', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 30, proteinas: 1.0, carbs: 1.0, grasas: 2.5, fibra: 0.5, ig: 5, equivalente: 'Libre', tags: ['vegetariano', 'keto'] },
+  { nombre: 'Leche  de  coco bebible', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 45, proteinas: 0.5, carbs: 2.0, grasas: 4.5, fibra: 0.0, ig: 5, equivalente: '1 Grasa', tags: ['vegetariano', 'keto'] },
+  { nombre: 'Leche  de  soya', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 80, proteinas: 7.0, carbs: 4.0, grasas: 3.5, fibra: 1.0, ig: 30, equivalente: '1 Leche semi', tags: ['vegetariano'] },
   { nombre: 'Queso vegano (soya)', categoria: 'Lacteos', pais: 'México', porcion: '30g', calorias: 70, proteinas: 3.0, carbs: 6.0, grasas: 4.0, fibra: 0.0, ig: 0, equivalente: '1 Grasa', tags: ['vegetariano'] },
-  { nombre: 'Yogurt de coco', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240g)', calorias: 120, proteinas: 1.0, carbs: 12.0, grasas: 8.0, fibra: 0.0, ig: 15, equivalente: '1 Grasa + 1 Fruta', tags: ['vegetariano'] },
-  { nombre: 'Kefir de leche', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 160, proteinas: 8.5, carbs: 12.0, grasas: 8.0, fibra: 0.0, ig: 36, equivalente: '1 Leche entera', tags: ['basico', 'probiotico', 'superfood'] },
-  { nombre: 'Aceite de oliva extra virgen', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'superfood', 'keto'] },
-  { nombre: 'Aceite de coco', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'keto'] },
-  { nombre: 'Aceite de aguacate', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'keto'] },
-  { nombre: 'Aceite de maiz', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
-  { nombre: 'Aceite de canola', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
-  { nombre: 'Aceite de girasol', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
-  { nombre: 'Manteca de cerdo', categoria: 'Grasas', pais: 'México', porcion: '1 cda (12g)', calorias: 115, proteinas: 0.0, carbs: 0.0, grasas: 12.8, fibra: 0.0, ig: 0, equivalente: '2.5 Grasas', tags: ['tradicional', 'keto'] },
+  { nombre: 'Yogurt  de  coco', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240g)', calorias: 120, proteinas: 1.0, carbs: 12.0, grasas: 8.0, fibra: 0.0, ig: 15, equivalente: '1 Grasa + 1 Fruta', tags: ['vegetariano'] },
+  { nombre: 'Kefir  de  leche', categoria: 'Lacteos', pais: 'México', porcion: '1 taza (240ml)', calorias: 160, proteinas: 8.5, carbs: 12.0, grasas: 8.0, fibra: 0.0, ig: 36, equivalente: '1 Leche entera', tags: ['basico', 'probiotico', 'superfood'] },
+  { nombre: 'Aceite  de  oliva extra virgen', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'superfood', 'keto'] },
+  { nombre: 'Aceite  de  coco', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'keto'] },
+  { nombre: 'Aceite  de  aguacate', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico', 'keto'] },
+  { nombre: 'Aceite  de  maiz', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
+  { nombre: 'Aceite  de  canola', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
+  { nombre: 'Aceite  de  girasol', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15ml)', calorias: 120, proteinas: 0.0, carbs: 0.0, grasas: 13.5, fibra: 0.0, ig: 0, equivalente: '3 Grasas', tags: ['basico'] },
+  { nombre: 'Manteca  de  cerdo', categoria: 'Grasas', pais: 'México', porcion: '1 cda (12g)', calorias: 115, proteinas: 0.0, carbs: 0.0, grasas: 12.8, fibra: 0.0, ig: 0, equivalente: '2.5 Grasas', tags: ['tradicional', 'keto'] },
   { nombre: 'Aguacate hass', categoria: 'Grasas', pais: 'México', porcion: '1/3 pieza (50g)', calorias: 80, proteinas: 1.0, carbs: 4.3, grasas: 7.3, fibra: 3.3, ig: 15, equivalente: '1.5 Grasas', tags: ['basico', 'superfood', 'keto'] },
   { nombre: 'Aguacate criollo', categoria: 'Grasas', pais: 'México', porcion: '1 pieza (80g)', calorias: 128, proteinas: 1.6, carbs: 6.8, grasas: 11.8, fibra: 5.4, ig: 15, equivalente: '2.5 Grasas', tags: ['basico'] },
   { nombre: 'Guacamole natural', categoria: 'Grasas', pais: 'México', porcion: '1/4 taza (60g)', calorias: 100, proteinas: 1.5, carbs: 5.0, grasas: 9.0, fibra: 3.8, ig: 15, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
@@ -254,99 +255,99 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Vinagreta balsamica', categoria: 'Grasas', pais: 'México', porcion: '2 cdas (30g)', calorias: 60, proteinas: 0.0, carbs: 5.0, grasas: 4.5, fibra: 0.0, ig: 15, equivalente: '1 Grasa', tags: ['basico'] },
   { nombre: 'Mayonesa light', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15g)', calorias: 50, proteinas: 0.0, carbs: 1.0, grasas: 5.0, fibra: 0.0, ig: 0, equivalente: '1 Grasa', tags: ['basico'] },
   { nombre: 'Mayonesa regular', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15g)', calorias: 100, proteinas: 0.0, carbs: 0.0, grasas: 11.0, fibra: 0.0, ig: 0, equivalente: '2 Grasas', tags: ['basico'] },
-  { nombre: 'Tahini (pasta de ajonjoli)', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15g)', calorias: 89, proteinas: 2.6, carbs: 3.2, grasas: 8.0, fibra: 1.4, ig: 0, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Pasta de cacahuate natural', categoria: 'Grasas', pais: 'México', porcion: '1 cda (16g)', calorias: 95, proteinas: 4.0, carbs: 3.5, grasas: 8.0, fibra: 1.0, ig: 14, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Mantequilla de almendra', categoria: 'Grasas', pais: 'México', porcion: '1 cda (16g)', calorias: 98, proteinas: 3.4, carbs: 3.0, grasas: 8.8, fibra: 1.6, ig: 0, equivalente: '2 Grasas', tags: ['basico', 'keto'] },
+  { nombre: 'Tahini (pasta  de  ajonjoli)', categoria: 'Grasas', pais: 'México', porcion: '1 cda (15g)', calorias: 89, proteinas: 2.6, carbs: 3.2, grasas: 8.0, fibra: 1.4, ig: 0, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
+  { nombre: 'Pasta  de  cacahuate natural', categoria: 'Grasas', pais: 'México', porcion: '1 cda (16g)', calorias: 95, proteinas: 4.0, carbs: 3.5, grasas: 8.0, fibra: 1.0, ig: 14, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
+  { nombre: 'Mantequilla  de  almendra', categoria: 'Grasas', pais: 'México', porcion: '1 cda (16g)', calorias: 98, proteinas: 3.4, carbs: 3.0, grasas: 8.8, fibra: 1.6, ig: 0, equivalente: '2 Grasas', tags: ['basico', 'keto'] },
   { nombre: 'Agua natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 0, proteinas: 0.0, carbs: 0.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'hidratacion'] },
-  { nombre: 'Agua de jamaica natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 20, proteinas: 0.0, carbs: 5.0, grasas: 0.0, fibra: 0.2, ig: 5, equivalente: 'Libre', tags: ['basico', 'hidratacion'] },
-  { nombre: 'Agua de horchata (arroz)', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 100, proteinas: 1.0, carbs: 20.0, grasas: 1.5, fibra: 0.3, ig: 70, equivalente: '1 Cereal c/g', tags: ['tradicional'] },
-  { nombre: 'Agua de horchata (almendra)', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 40, proteinas: 1.0, carbs: 5.0, grasas: 2.0, fibra: 0.3, ig: 5, equivalente: 'Libre', tags: ['tradicional'] },
-  { nombre: 'Agua de limon con chia', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 15, proteinas: 0.5, carbs: 3.0, grasas: 0.5, fibra: 2.0, ig: 5, equivalente: 'Libre', tags: ['basico', 'hidratacion', 'superfood'] },
+  { nombre: 'Agua  de  jamaica natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 20, proteinas: 0.0, carbs: 5.0, grasas: 0.0, fibra: 0.2, ig: 5, equivalente: 'Libre', tags: ['basico', 'hidratacion'] },
+  { nombre: 'Agua  de  horchata (arroz)', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 100, proteinas: 1.0, carbs: 20.0, grasas: 1.5, fibra: 0.3, ig: 70, equivalente: '1 Cereal c/g', tags: ['tradicional'] },
+  { nombre: 'Agua  de  horchata (almendra)', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 40, proteinas: 1.0, carbs: 5.0, grasas: 2.0, fibra: 0.3, ig: 5, equivalente: 'Libre', tags: ['tradicional'] },
+  { nombre: 'Agua  de  limon con chia', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 15, proteinas: 0.5, carbs: 3.0, grasas: 0.5, fibra: 2.0, ig: 5, equivalente: 'Libre', tags: ['basico', 'hidratacion', 'superfood'] },
   { nombre: 'Cafe americano', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 2, proteinas: 0.3, carbs: 0.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Cafe con leche descremada', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 45, proteinas: 4.0, carbs: 6.0, grasas: 0.2, fibra: 0.0, ig: 32, equivalente: '1/2 Leche descremada', tags: ['basico', 'desayuno'] },
   { nombre: 'Cafe con leche entera', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 80, proteinas: 4.0, carbs: 6.0, grasas: 4.2, fibra: 0.0, ig: 30, equivalente: '1/2 Leche entera', tags: ['basico', 'desayuno'] },
   { nombre: 'Te verde natural', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 2, proteinas: 0.0, carbs: 0.5, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'superfood'] },
   { nombre: 'Te negro natural', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 2, proteinas: 0.0, carbs: 0.5, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
-  { nombre: 'Te de manzanilla', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 0, proteinas: 0.0, carbs: 0.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'digestivo'] },
-  { nombre: 'Jugo de naranja natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 112, proteinas: 1.7, carbs: 25.8, grasas: 0.5, fibra: 0.5, ig: 50, equivalente: '2 Frutas', tags: ['basico'] },
-  { nombre: 'Jugo de zanahoria', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 94, proteinas: 2.2, carbs: 21.9, grasas: 0.4, fibra: 1.9, ig: 47, equivalente: '1 Verdura + 1 Fruta', tags: ['basico'] },
+  { nombre: 'Te  de  manzanilla', categoria: 'Bebidas', pais: 'México', porcion: '1 taza (240ml)', calorias: 0, proteinas: 0.0, carbs: 0.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'digestivo'] },
+  { nombre: 'Jugo  de  naranja natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 112, proteinas: 1.7, carbs: 25.8, grasas: 0.5, fibra: 0.5, ig: 50, equivalente: '2 Frutas', tags: ['basico'] },
+  { nombre: 'Jugo  de  zanahoria', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 94, proteinas: 2.2, carbs: 21.9, grasas: 0.4, fibra: 1.9, ig: 47, equivalente: '1 Verdura + 1 Fruta', tags: ['basico'] },
   { nombre: 'Jugo verde (detox)', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 60, proteinas: 2.0, carbs: 12.0, grasas: 0.5, fibra: 3.0, ig: 15, equivalente: '1 Verdura', tags: ['basico', 'superfood'] },
-  { nombre: 'Licuado de platano con leche', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (300ml)', calorias: 200, proteinas: 8.0, carbs: 35.0, grasas: 4.5, fibra: 2.0, ig: 50, equivalente: '1 Leche entera + 1 Fruta', tags: ['basico', 'desayuno'] },
-  { nombre: 'Licuado de fresa con leche', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (300ml)', calorias: 160, proteinas: 8.5, carbs: 26.0, grasas: 3.5, fibra: 2.5, ig: 40, equivalente: '1 Leche entera + 1 Fruta', tags: ['basico', 'desayuno'] },
-  { nombre: 'Agua de coco natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 46, proteinas: 1.7, carbs: 8.9, grasas: 0.5, fibra: 2.6, ig: 5, equivalente: '1/2 Fruta', tags: ['basico', 'hidratacion', 'electrolitos'] },
+  { nombre: 'Licuado  de  platano con leche', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (300ml)', calorias: 200, proteinas: 8.0, carbs: 35.0, grasas: 4.5, fibra: 2.0, ig: 50, equivalente: '1 Leche entera + 1 Fruta', tags: ['basico', 'desayuno'] },
+  { nombre: 'Licuado  de  fresa con leche', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (300ml)', calorias: 160, proteinas: 8.5, carbs: 26.0, grasas: 3.5, fibra: 2.5, ig: 40, equivalente: '1 Leche entera + 1 Fruta', tags: ['basico', 'desayuno'] },
+  { nombre: 'Agua  de  coco natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 46, proteinas: 1.7, carbs: 8.9, grasas: 0.5, fibra: 2.6, ig: 5, equivalente: '1/2 Fruta', tags: ['basico', 'hidratacion', 'electrolitos'] },
   { nombre: 'Bebida isotonica comercial', categoria: 'Bebidas', pais: 'México', porcion: '1 botella (500ml)', calorias: 120, proteinas: 0.0, carbs: 30.0, grasas: 0.0, fibra: 0.0, ig: 78, equivalente: '2 Cereales s/g', tags: ['deportivo', 'hidratacion'] },
   { nombre: 'Bebida energetica', categoria: 'Bebidas', pais: 'México', porcion: '1 lata (250ml)', calorias: 110, proteinas: 0.0, carbs: 27.0, grasas: 0.0, fibra: 0.0, ig: 70, equivalente: '2 Cereales s/g', tags: ['pre-entreno'] },
   { nombre: 'Pulque natural', categoria: 'Bebidas', pais: 'México', porcion: '1 vaso (250ml)', calorias: 120, proteinas: 0.5, carbs: 12.0, grasas: 0.0, fibra: 0.0, ig: 5, equivalente: '1 Cereal c/g', tags: ['tradicional', 'fermentado'] },
-  { nombre: 'Dulce de leche', categoria: 'Dulces', pais: 'Argentina', porcion: '1 cda (20g)', calorias: 60, proteinas: 1.0, carbs: 10.0, grasas: 1.5, fibra: 0.0, ig: 50, equivalente: '1/2 Cereal c/g', tags: ['tradicional', 'postre'] },
-  { nombre: 'Cajeta de Celaya', categoria: 'Dulces', pais: 'México', porcion: '1 cda (20g)', calorias: 65, proteinas: 1.0, carbs: 11.0, grasas: 2.0, fibra: 0.0, ig: 50, equivalente: '1/2 Cereal c/g', tags: ['tradicional', 'postre'] },
+  { nombre: 'Dulce  de  leche', categoria: 'Dulces', pais: 'Argentina', porcion: '1 cda (20g)', calorias: 60, proteinas: 1.0, carbs: 10.0, grasas: 1.5, fibra: 0.0, ig: 50, equivalente: '1/2 Cereal c/g', tags: ['tradicional', 'postre'] },
+  { nombre: 'Cajeta  de  Celaya', categoria: 'Dulces', pais: 'México', porcion: '1 cda (20g)', calorias: 65, proteinas: 1.0, carbs: 11.0, grasas: 2.0, fibra: 0.0, ig: 50, equivalente: '1/2 Cereal c/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Chongos zamoranos', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (100g)', calorias: 180, proteinas: 6.0, carbs: 28.0, grasas: 5.0, fibra: 0.0, ig: 40, equivalente: '1 Leche entera + 1 Cereal c/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Arroz con leche', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (100g)', calorias: 150, proteinas: 4.0, carbs: 25.0, grasas: 4.0, fibra: 0.3, ig: 50, equivalente: '1 Leche entera + 1 Cereal s/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Flan napolitano', categoria: 'Dulces', pais: 'México', porcion: '1 rebanada (80g)', calorias: 180, proteinas: 5.0, carbs: 25.0, grasas: 6.0, fibra: 0.0, ig: 40, equivalente: '1 Leche entera + 1 Cereal c/g', tags: ['tradicional', 'postre'] },
-  { nombre: 'Gelatina de frutas', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (100g)', calorias: 70, proteinas: 1.5, carbs: 15.0, grasas: 0.0, fibra: 0.0, ig: 50, equivalente: '1 Fruta', tags: ['basico', 'postre'] },
+  { nombre: 'Gelatina  de  frutas', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (100g)', calorias: 70, proteinas: 1.5, carbs: 15.0, grasas: 0.0, fibra: 0.0, ig: 50, equivalente: '1 Fruta', tags: ['basico', 'postre'] },
   { nombre: 'Gelatina natural sin azucar', categoria: 'Dulces', pais: 'México', porcion: '1 taza (240g)', calorias: 20, proteinas: 4.0, carbs: 0.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'keto'] },
   { nombre: 'Jericalla', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (100g)', calorias: 200, proteinas: 6.0, carbs: 25.0, grasas: 8.0, fibra: 0.0, ig: 40, equivalente: '1 Leche entera + 1 Cereal c/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Chocolate semi-amargo', categoria: 'Dulces', pais: 'México', porcion: '20g', calorias: 100, proteinas: 1.5, carbs: 8.0, grasas: 7.0, fibra: 1.5, ig: 23, equivalente: '1 Grasa + 1/2 Fruta', tags: ['basico', 'superfood'] },
   { nombre: 'Chocolate amargo 70%', categoria: 'Dulces', pais: 'México', porcion: '20g', calorias: 110, proteinas: 1.8, carbs: 7.0, grasas: 8.5, fibra: 2.0, ig: 22, equivalente: '1.5 Grasas', tags: ['basico', 'superfood', 'keto'] },
   { nombre: 'Champurrado', categoria: 'Dulces', pais: 'México', porcion: '1 taza (250ml)', calorias: 180, proteinas: 4.0, carbs: 30.0, grasas: 4.0, fibra: 1.5, ig: 55, equivalente: '1 Leche entera + 1 Cereal s/g', tags: ['tradicional', 'desayuno'] },
-  { nombre: 'Atole de maiz', categoria: 'Dulces', pais: 'México', porcion: '1 taza (250ml)', calorias: 120, proteinas: 3.0, carbs: 22.0, grasas: 2.5, fibra: 1.0, ig: 55, equivalente: '1 Cereal s/g + 1/2 Leche', tags: ['tradicional', 'desayuno'] },
-  { nombre: 'Atole de avena', categoria: 'Dulces', pais: 'México', porcion: '1 taza (250ml)', calorias: 140, proteinas: 4.5, carbs: 24.0, grasas: 3.0, fibra: 2.5, ig: 42, equivalente: '1 Cereal s/g + 1/2 Leche', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Atole  de  maiz', categoria: 'Dulces', pais: 'México', porcion: '1 taza (250ml)', calorias: 120, proteinas: 3.0, carbs: 22.0, grasas: 2.5, fibra: 1.0, ig: 55, equivalente: '1 Cereal s/g + 1/2 Leche', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Atole  de  avena', categoria: 'Dulces', pais: 'México', porcion: '1 taza (250ml)', calorias: 140, proteinas: 4.5, carbs: 24.0, grasas: 3.0, fibra: 2.5, ig: 42, equivalente: '1 Cereal s/g + 1/2 Leche', tags: ['tradicional', 'desayuno'] },
   { nombre: 'Panquecito (mantecada)', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (40g)', calorias: 160, proteinas: 2.5, carbs: 22.0, grasas: 7.0, fibra: 0.5, ig: 65, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
-  { nombre: 'Concha de pan dulce', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (55g)', calorias: 200, proteinas: 4.5, carbs: 35.0, grasas: 5.0, fibra: 1.5, ig: 70, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
-  { nombre: 'Oreja de pan dulce', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (35g)', calorias: 140, proteinas: 2.5, carbs: 20.0, grasas: 5.5, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['tradicional'] },
+  { nombre: 'Concha  de  pan dulce', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (55g)', calorias: 200, proteinas: 4.5, carbs: 35.0, grasas: 5.0, fibra: 1.5, ig: 70, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Oreja  de  pan dulce', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (35g)', calorias: 140, proteinas: 2.5, carbs: 20.0, grasas: 5.5, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['tradicional'] },
   { nombre: 'Bunuelo', categoria: 'Dulces', pais: 'Colombia', porcion: '1 pieza (40g)', calorias: 180, proteinas: 2.0, carbs: 24.0, grasas: 8.0, fibra: 0.8, ig: 70, equivalente: '1 Cereal c/g + 1.5 Grasas', tags: ['tradicional'] },
   { nombre: 'Natilla colombiana', categoria: 'Dulces', pais: 'Colombia', porcion: '1/2 taza (100g)', calorias: 160, proteinas: 5.0, carbs: 28.0, grasas: 3.5, fibra: 0.0, ig: 45, equivalente: '1 Leche entera + 1 Cereal s/g', tags: ['tradicional', 'postre'] },
   { nombre: 'Suspiro limeno', categoria: 'Dulces', pais: 'Perú', porcion: '1 pieza (60g)', calorias: 220, proteinas: 4.0, carbs: 28.0, grasas: 10.0, fibra: 0.0, ig: 40, equivalente: '1 Leche entera + 2 Grasas', tags: ['tradicional', 'postre'] },
   { nombre: 'Mazamorra morada', categoria: 'Dulces', pais: 'Perú', porcion: '1 taza (250g)', calorias: 200, proteinas: 3.0, carbs: 40.0, grasas: 3.0, fibra: 2.0, ig: 50, equivalente: '2 Cereales c/g', tags: ['tradicional', 'postre'] },
-  { nombre: 'Helado de vainilla', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (80g)', calorias: 140, proteinas: 2.5, carbs: 16.0, grasas: 7.0, fibra: 0.0, ig: 65, equivalente: '1 Grasa + 1 Fruta', tags: ['postre'] },
-  { nombre: 'Nieve de garrafa (limon)', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (80g)', calorias: 90, proteinas: 0.0, carbs: 20.0, grasas: 0.0, fibra: 0.0, ig: 50, equivalente: '1 Fruta', tags: ['postre', 'tradicional'] },
+  { nombre: 'Helado  de  vainilla', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (80g)', calorias: 140, proteinas: 2.5, carbs: 16.0, grasas: 7.0, fibra: 0.0, ig: 65, equivalente: '1 Grasa + 1 Fruta', tags: ['postre'] },
+  { nombre: 'Nieve  de  garrafa (limon)', categoria: 'Dulces', pais: 'México', porcion: '1/2 taza (80g)', calorias: 90, proteinas: 0.0, carbs: 20.0, grasas: 0.0, fibra: 0.0, ig: 50, equivalente: '1 Fruta', tags: ['postre', 'tradicional'] },
   { nombre: 'Galleta Maria', categoria: 'Dulces', pais: 'México', porcion: '3 piezas (15g)', calorias: 70, proteinas: 1.2, carbs: 12.0, grasas: 2.0, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
-  { nombre: 'Galleta de animalitos', categoria: 'Dulces', pais: 'México', porcion: '10 piezas (20g)', calorias: 90, proteinas: 1.5, carbs: 14.0, grasas: 3.0, fibra: 0.5, ig: 75, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
-  { nombre: 'Palanqueta de cacahuate', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (25g)', calorias: 120, proteinas: 3.0, carbs: 12.0, grasas: 7.0, fibra: 1.0, ig: 50, equivalente: '1 Cereal s/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
-  { nombre: 'Alegria de amaranto', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (30g)', calorias: 120, proteinas: 2.0, carbs: 20.0, grasas: 3.5, fibra: 1.5, ig: 35, equivalente: '1 Cereal c/g', tags: ['tradicional', 'superfood', 'colacion'] },
+  { nombre: 'Galleta  de  animalitos', categoria: 'Dulces', pais: 'México', porcion: '10 piezas (20g)', calorias: 90, proteinas: 1.5, carbs: 14.0, grasas: 3.0, fibra: 0.5, ig: 75, equivalente: '1 Cereal c/g', tags: ['basico', 'colacion'] },
+  { nombre: 'Palanqueta  de  cacahuate', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (25g)', calorias: 120, proteinas: 3.0, carbs: 12.0, grasas: 7.0, fibra: 1.0, ig: 50, equivalente: '1 Cereal s/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Alegria  de  amaranto', categoria: 'Dulces', pais: 'México', porcion: '1 pieza (30g)', calorias: 120, proteinas: 2.0, carbs: 20.0, grasas: 3.5, fibra: 1.5, ig: 35, equivalente: '1 Cereal c/g', tags: ['tradicional', 'superfood', 'colacion'] },
   { nombre: 'Salsa verde cruda', categoria: 'Condimentos', pais: 'México', porcion: '1/4 taza (60g)', calorias: 20, proteinas: 0.5, carbs: 4.0, grasas: 0.2, fibra: 1.0, ig: 5, equivalente: 'Libre', tags: ['basico', 'tradicional'] },
   { nombre: 'Salsa roja cocida', categoria: 'Condimentos', pais: 'México', porcion: '1/4 taza (60g)', calorias: 25, proteinas: 0.5, carbs: 5.0, grasas: 0.3, fibra: 1.2, ig: 5, equivalente: 'Libre', tags: ['basico', 'tradicional'] },
   { nombre: 'Guacamole natural', categoria: 'Condimentos', pais: 'México', porcion: '1/4 taza (60g)', calorias: 100, proteinas: 1.5, carbs: 5.0, grasas: 9.0, fibra: 3.8, ig: 15, equivalente: '2 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Pico de gallo', categoria: 'Condimentos', pais: 'México', porcion: '1/2 taza (80g)', calorias: 18, proteinas: 0.5, carbs: 3.8, grasas: 0.2, fibra: 1.2, ig: 10, equivalente: 'Libre', tags: ['basico'] },
+  { nombre: 'Pico  de  gallo', categoria: 'Condimentos', pais: 'México', porcion: '1/2 taza (80g)', calorias: 18, proteinas: 0.5, carbs: 3.8, grasas: 0.2, fibra: 1.2, ig: 10, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Mole poblano', categoria: 'Condimentos', pais: 'México', porcion: '1/2 taza (100g)', calorias: 200, proteinas: 6.0, carbs: 15.0, grasas: 14.0, fibra: 3.0, ig: 20, equivalente: '1 Carne magra + 2 Grasas', tags: ['tradicional', 'superfood'] },
   { nombre: 'Mole verde', categoria: 'Condimentos', pais: 'México', porcion: '1/2 taza (100g)', calorias: 160, proteinas: 5.0, carbs: 12.0, grasas: 10.0, fibra: 2.5, ig: 15, equivalente: '1 Carne magra + 1.5 Grasas', tags: ['tradicional'] },
   { nombre: 'Pipian rojo', categoria: 'Condimentos', pais: 'México', porcion: '1/2 taza (100g)', calorias: 180, proteinas: 5.0, carbs: 10.0, grasas: 13.0, fibra: 2.5, ig: 15, equivalente: '1 Carne magra + 2 Grasas', tags: ['tradicional'] },
-  { nombre: 'Adobo de chile', categoria: 'Condimentos', pais: 'México', porcion: '1/4 taza (60g)', calorias: 30, proteinas: 1.0, carbs: 4.0, grasas: 1.5, fibra: 1.5, ig: 5, equivalente: 'Libre', tags: ['tradicional'] },
+  { nombre: 'Adobo  de  chile', categoria: 'Condimentos', pais: 'México', porcion: '1/4 taza (60g)', calorias: 30, proteinas: 1.0, carbs: 4.0, grasas: 1.5, fibra: 1.5, ig: 5, equivalente: 'Libre', tags: ['tradicional'] },
   { nombre: 'Recado rojo', categoria: 'Condimentos', pais: 'Yucatán', porcion: '2 cdas (30g)', calorias: 35, proteinas: 0.5, carbs: 5.0, grasas: 1.5, fibra: 1.5, ig: 5, equivalente: 'Libre', tags: ['tradicional'] },
-  { nombre: 'Salsa de soya baja en sodio', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 8, proteinas: 0.8, carbs: 1.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
+  { nombre: 'Salsa  de  soya baja en sodio', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 8, proteinas: 0.8, carbs: 1.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Salsa inglesa', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 10, proteinas: 0.0, carbs: 2.0, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Mostaza', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15g)', calorias: 10, proteinas: 0.5, carbs: 1.0, grasas: 0.5, fibra: 0.5, ig: 0, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Ketchup', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15g)', calorias: 15, proteinas: 0.2, carbs: 4.0, grasas: 0.0, fibra: 0.2, ig: 55, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Sriracha', categoria: 'Condimentos', pais: 'Tailandia', porcion: '1 cda (15g)', calorias: 15, proteinas: 0.3, carbs: 3.0, grasas: 0.2, fibra: 0.5, ig: 15, equivalente: 'Libre', tags: ['basico'] },
   { nombre: 'Vinagre blanco', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 3, proteinas: 0.0, carbs: 0.1, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico'] },
-  { nombre: 'Vinagre de manzana', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 3, proteinas: 0.0, carbs: 0.1, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'superfood'] },
-  { nombre: 'Consome de pollo', categoria: 'Condimentos', pais: 'México', porcion: '1 taza (250ml)', calorias: 15, proteinas: 2.0, carbs: 1.0, grasas: 0.5, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'sopa'] },
-  { nombre: 'Caldo de res', categoria: 'Condimentos', pais: 'México', porcion: '1 taza (250ml)', calorias: 20, proteinas: 3.0, carbs: 1.0, grasas: 0.5, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'sopa'] },
+  { nombre: 'Vinagre  de  manzana', categoria: 'Condimentos', pais: 'México', porcion: '1 cda (15ml)', calorias: 3, proteinas: 0.0, carbs: 0.1, grasas: 0.0, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'superfood'] },
+  { nombre: 'Consome  de  pollo', categoria: 'Condimentos', pais: 'México', porcion: '1 taza (250ml)', calorias: 15, proteinas: 2.0, carbs: 1.0, grasas: 0.5, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'sopa'] },
+  { nombre: 'Caldo  de  res', categoria: 'Condimentos', pais: 'México', porcion: '1 taza (250ml)', calorias: 20, proteinas: 3.0, carbs: 1.0, grasas: 0.5, fibra: 0.0, ig: 0, equivalente: 'Libre', tags: ['basico', 'sopa'] },
   { nombre: 'Palomitas naturales', categoria: 'Snacks', pais: 'México', porcion: '3 tazas (25g)', calorias: 93, proteinas: 3.0, carbs: 19.0, grasas: 1.1, fibra: 3.6, ig: 55, equivalente: '1 Cereal s/g', tags: ['basico', 'colacion'] },
   { nombre: 'Palomitas con mantequilla', categoria: 'Snacks', pais: 'México', porcion: '2 tazas (25g)', calorias: 140, proteinas: 2.5, carbs: 14.0, grasas: 9.0, fibra: 2.5, ig: 55, equivalente: '1 Cereal c/g + 1.5 Grasas', tags: ['colacion'] },
-  { nombre: 'Chicharrones de cerdo', categoria: 'Snacks', pais: 'México', porcion: '20g (1 puño)', calorias: 110, proteinas: 7.0, carbs: 0.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional', 'keto'] },
-  { nombre: 'Chicharrones de harina', categoria: 'Snacks', pais: 'México', porcion: '30g (3 piezas)', calorias: 150, proteinas: 2.0, carbs: 18.0, grasas: 8.0, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Chicharrones  de  cerdo', categoria: 'Snacks', pais: 'México', porcion: '20g (1 puño)', calorias: 110, proteinas: 7.0, carbs: 0.0, grasas: 9.0, fibra: 0.0, ig: 0, equivalente: '1 Carne magra + 1 Grasa', tags: ['tradicional', 'keto'] },
+  { nombre: 'Chicharrones  de  harina', categoria: 'Snacks', pais: 'México', porcion: '30g (3 piezas)', calorias: 150, proteinas: 2.0, carbs: 18.0, grasas: 8.0, fibra: 0.5, ig: 70, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
   { nombre: 'Fruta deshidratada mixta', categoria: 'Snacks', pais: 'México', porcion: '1/4 taza (30g)', calorias: 90, proteinas: 0.5, carbs: 22.0, grasas: 0.0, fibra: 2.0, ig: 55, equivalente: '1.5 Frutas', tags: ['colacion'] },
   { nombre: 'Nuez mixta cruda', categoria: 'Snacks', pais: 'México', porcion: '1/4 taza (30g)', calorias: 180, proteinas: 5.0, carbs: 5.0, grasas: 16.0, fibra: 2.5, ig: 15, equivalente: '3 Grasas', tags: ['basico', 'superfood', 'keto'] },
   { nombre: 'Almendra cruda', categoria: 'Snacks', pais: 'México', porcion: '15 piezas (15g)', calorias: 90, proteinas: 3.0, carbs: 3.5, grasas: 7.5, fibra: 1.5, ig: 0, equivalente: '1.5 Grasas', tags: ['basico', 'superfood', 'keto'] },
-  { nombre: 'Nuez de la india (pacana)', categoria: 'Snacks', pais: 'México', porcion: '10 mitades (15g)', calorias: 100, proteinas: 1.0, carbs: 2.0, grasas: 10.5, fibra: 1.5, ig: 10, equivalente: '2 Grasas', tags: ['basico', 'superfood', 'keto'] },
+  { nombre: 'Nuez  de  la india (pacana)', categoria: 'Snacks', pais: 'México', porcion: '10 mitades (15g)', calorias: 100, proteinas: 1.0, carbs: 2.0, grasas: 10.5, fibra: 1.5, ig: 10, equivalente: '2 Grasas', tags: ['basico', 'superfood', 'keto'] },
   { nombre: 'Pistache tostado', categoria: 'Snacks', pais: 'México', porcion: '15 piezas (15g)', calorias: 85, proteinas: 3.0, carbs: 4.0, grasas: 7.0, fibra: 1.5, ig: 15, equivalente: '1.5 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Semilla de calabaza (pepita)', categoria: 'Snacks', pais: 'México', porcion: '2 cdas (15g)', calorias: 85, proteinas: 4.0, carbs: 3.0, grasas: 7.0, fibra: 1.5, ig: 10, equivalente: '1.5 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Semilla de girasol', categoria: 'Snacks', pais: 'México', porcion: '2 cdas (15g)', calorias: 85, proteinas: 3.0, carbs: 3.0, grasas: 7.5, fibra: 1.5, ig: 20, equivalente: '1.5 Grasas', tags: ['basico', 'superfood'] },
-  { nombre: 'Semilla de chia', categoria: 'Snacks', pais: 'México', porcion: '1 cda (12g)', calorias: 58, proteinas: 2.0, carbs: 5.0, grasas: 3.7, fibra: 4.3, ig: 1, equivalente: '1 Grasa', tags: ['basico', 'superfood'] },
+  { nombre: 'Semilla  de  calabaza (pepita)', categoria: 'Snacks', pais: 'México', porcion: '2 cdas (15g)', calorias: 85, proteinas: 4.0, carbs: 3.0, grasas: 7.0, fibra: 1.5, ig: 10, equivalente: '1.5 Grasas', tags: ['basico', 'superfood'] },
+  { nombre: 'Semilla  de  girasol', categoria: 'Snacks', pais: 'México', porcion: '2 cdas (15g)', calorias: 85, proteinas: 3.0, carbs: 3.0, grasas: 7.5, fibra: 1.5, ig: 20, equivalente: '1.5 Grasas', tags: ['basico', 'superfood'] },
+  { nombre: 'Semilla  de  chia', categoria: 'Snacks', pais: 'México', porcion: '1 cda (12g)', calorias: 58, proteinas: 2.0, carbs: 5.0, grasas: 3.7, fibra: 4.3, ig: 1, equivalente: '1 Grasa', tags: ['basico', 'superfood'] },
   { nombre: 'Chia hidratada', categoria: 'Snacks', pais: 'México', porcion: '2 cdas (20g)', calorias: 30, proteinas: 1.0, carbs: 2.5, grasas: 1.8, fibra: 3.0, ig: 1, equivalente: 'Libre', tags: ['basico', 'superfood'] },
-  { nombre: 'Barra de granola', categoria: 'Snacks', pais: 'México', porcion: '1 pieza (30g)', calorias: 130, proteinas: 2.5, carbs: 20.0, grasas: 4.5, fibra: 1.5, ig: 55, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['colacion', 'desayuno'] },
-  { nombre: 'Barra de proteina', categoria: 'Snacks', pais: 'México', porcion: '1 pieza (60g)', calorias: 220, proteinas: 20.0, carbs: 22.0, grasas: 6.0, fibra: 3.0, ig: 30, equivalente: '1 Carne magra + 1 Cereal c/g', tags: ['post-entreno', 'colacion'] },
-  { nombre: 'Chips de platano', categoria: 'Snacks', pais: 'México', porcion: '15 piezas (30g)', calorias: 160, proteinas: 1.0, carbs: 20.0, grasas: 9.0, fibra: 2.0, ig: 55, equivalente: '1 Fruta + 1.5 Grasas', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Barra  de  granola', categoria: 'Snacks', pais: 'México', porcion: '1 pieza (30g)', calorias: 130, proteinas: 2.5, carbs: 20.0, grasas: 4.5, fibra: 1.5, ig: 55, equivalente: '1 Cereal c/g + 1 Grasa', tags: ['colacion', 'desayuno'] },
+  { nombre: 'Barra  de  proteina', categoria: 'Snacks', pais: 'México', porcion: '1 pieza (60g)', calorias: 220, proteinas: 20.0, carbs: 22.0, grasas: 6.0, fibra: 3.0, ig: 30, equivalente: '1 Carne magra + 1 Cereal c/g', tags: ['post-entreno', 'colacion'] },
+  { nombre: 'Chips  de  platano', categoria: 'Snacks', pais: 'México', porcion: '15 piezas (30g)', calorias: 160, proteinas: 1.0, carbs: 20.0, grasas: 9.0, fibra: 2.0, ig: 55, equivalente: '1 Fruta + 1.5 Grasas', tags: ['tradicional', 'colacion'] },
   { nombre: 'Totopo horneado', categoria: 'Snacks', pais: 'México', porcion: '10 piezas (30g)', calorias: 130, proteinas: 2.0, carbs: 24.0, grasas: 3.0, fibra: 2.0, ig: 60, equivalente: '1.5 Cereales s/g', tags: ['basico'] },
-  { nombre: 'Galleta de arroz', categoria: 'Snacks', pais: 'México', porcion: '2 piezas (20g)', calorias: 70, proteinas: 1.0, carbs: 14.0, grasas: 0.5, fibra: 0.3, ig: 85, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
+  { nombre: 'Galleta  de  arroz', categoria: 'Snacks', pais: 'México', porcion: '2 piezas (20g)', calorias: 70, proteinas: 1.0, carbs: 14.0, grasas: 0.5, fibra: 0.3, ig: 85, equivalente: '1 Cereal s/g', tags: ['basico', 'gluten-free'] },
   { nombre: 'Hummus con zanahoria', categoria: 'Snacks', pais: 'México', porcion: '1/4 taza (60g)', calorias: 100, proteinas: 3.5, carbs: 8.0, grasas: 6.5, fibra: 3.0, ig: 28, equivalente: '1 Leguminosa + 1 Grasa', tags: ['vegetariano', 'colacion'] },
   { nombre: 'Yogurt griego con nuez', categoria: 'Snacks', pais: 'México', porcion: '1 taza (200g)', calorias: 250, proteinas: 20.0, carbs: 12.0, grasas: 14.0, fibra: 1.0, ig: 15, equivalente: '2 Leches enteras + 2 Grasas', tags: ['colacion', 'superfood'] },
-  { nombre: 'Tamal de pollo (oaxaqueño)', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (150g)', calorias: 280, proteinas: 12.0, carbs: 32.0, grasas: 12.0, fibra: 4.5, ig: 55, equivalente: '2 Cereales c/g + 1 Carne magra', tags: ['tradicional', 'desayuno'] },
-  { nombre: 'Tamal de dulce', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 220, proteinas: 3.0, carbs: 36.0, grasas: 8.0, fibra: 2.5, ig: 55, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
-  { nombre: 'Tamal de elote dulce', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 200, proteinas: 4.0, carbs: 34.0, grasas: 6.0, fibra: 3.0, ig: 55, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Tamal  de  pollo (oaxaqueño)', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (150g)', calorias: 280, proteinas: 12.0, carbs: 32.0, grasas: 12.0, fibra: 4.5, ig: 55, equivalente: '2 Cereales c/g + 1 Carne magra', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Tamal  de  dulce', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 220, proteinas: 3.0, carbs: 36.0, grasas: 8.0, fibra: 2.5, ig: 55, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
+  { nombre: 'Tamal  de  elote dulce', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 200, proteinas: 4.0, carbs: 34.0, grasas: 6.0, fibra: 3.0, ig: 55, equivalente: '2 Cereales c/g', tags: ['tradicional', 'desayuno'] },
   { nombre: 'Tacos al pastor (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 350, proteinas: 22.0, carbs: 35.0, grasas: 14.0, fibra: 5.0, ig: 55, equivalente: '2 Carnes magras + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'cena'] },
-  { nombre: 'Tacos de bistec (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 380, proteinas: 26.0, carbs: 35.0, grasas: 16.0, fibra: 5.0, ig: 55, equivalente: '2 Carnes magras + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'cena'] },
-  { nombre: 'Tacos de pollo (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 320, proteinas: 24.0, carbs: 35.0, grasas: 10.0, fibra: 5.0, ig: 55, equivalente: '2 Carnes magras + 2 Cereales s/g', tags: ['tradicional', 'cena'] },
+  { nombre: 'Tacos  de  bistec (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 380, proteinas: 26.0, carbs: 35.0, grasas: 16.0, fibra: 5.0, ig: 55, equivalente: '2 Carnes magras + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'cena'] },
+  { nombre: 'Tacos  de  pollo (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 320, proteinas: 24.0, carbs: 35.0, grasas: 10.0, fibra: 5.0, ig: 55, equivalente: '2 Carnes magras + 2 Cereales s/g', tags: ['tradicional', 'cena'] },
   { nombre: 'Enchiladas verdes (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (250g)', calorias: 380, proteinas: 22.0, carbs: 38.0, grasas: 16.0, fibra: 6.0, ig: 45, equivalente: '1.5 Carnes magras + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Enchiladas rojas (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (250g)', calorias: 360, proteinas: 20.0, carbs: 36.0, grasas: 15.0, fibra: 5.5, ig: 45, equivalente: '1.5 Carnes magras + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Chilaquiles verdes con pollo', categoria: 'Preparados', pais: 'México', porcion: '1 plato (250g)', calorias: 450, proteinas: 25.0, carbs: 45.0, grasas: 20.0, fibra: 6.0, ig: 55, equivalente: '2 Carnes magras + 2.5 Cereales c/g', tags: ['tradicional', 'desayuno'] },
@@ -356,26 +357,26 @@ const ALIMENTOS: AlimentoLATAM[] = [
   { nombre: 'Machaca con huevo', categoria: 'Preparados', pais: 'México', porcion: '1 plato (200g)', calorias: 320, proteinas: 26.0, carbs: 10.0, grasas: 20.0, fibra: 2.0, ig: 10, equivalente: '2 Carnes magras + 2 Grasas', tags: ['tradicional', 'desayuno'] },
   { nombre: 'Pozole rojo con pollo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (350g)', calorias: 280, proteinas: 20.0, carbs: 30.0, grasas: 8.0, fibra: 5.0, ig: 45, equivalente: '1 Carne magra + 2 Cereales s/g + 1 Verdura', tags: ['tradicional', 'almuerzo', 'invierno'] },
   { nombre: 'Pozole verde con cerdo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (350g)', calorias: 320, proteinas: 22.0, carbs: 28.0, grasas: 12.0, fibra: 5.0, ig: 45, equivalente: '1 Carne semigrasa + 2 Cereales s/g + 1 Verdura', tags: ['tradicional', 'almuerzo'] },
-  { nombre: 'Sopa de tortilla', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 180, proteinas: 6.0, carbs: 22.0, grasas: 7.0, fibra: 4.0, ig: 55, equivalente: '1 Cereal c/g + 1 Verdura + 1 Grasa', tags: ['tradicional', 'almuerzo', 'sopa'] },
+  { nombre: 'Sopa  de  tortilla', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 180, proteinas: 6.0, carbs: 22.0, grasas: 7.0, fibra: 4.0, ig: 55, equivalente: '1 Cereal c/g + 1 Verdura + 1 Grasa', tags: ['tradicional', 'almuerzo', 'sopa'] },
   { nombre: 'Caldo tlalpeño', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 200, proteinas: 14.0, carbs: 20.0, grasas: 7.0, fibra: 6.0, ig: 30, equivalente: '1 Carne magra + 1 Cereal s/g + 1 Verdura', tags: ['tradicional', 'almuerzo', 'sopa'] },
-  { nombre: 'Sopa de fideo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (250g)', calorias: 150, proteinas: 4.0, carbs: 24.0, grasas: 4.0, fibra: 1.5, ig: 45, equivalente: '1 Cereal s/g + 1/2 Grasa', tags: ['tradicional', 'sopa', 'almuerzo'] },
-  { nombre: 'Sopa de arroz', categoria: 'Preparados', pais: 'México', porcion: '1 taza (250g)', calorias: 130, proteinas: 3.0, carbs: 22.0, grasas: 3.0, fibra: 0.5, ig: 73, equivalente: '1 Cereal s/g', tags: ['tradicional', 'sopa'] },
-  { nombre: 'Mole de olla', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 250, proteinas: 18.0, carbs: 22.0, grasas: 10.0, fibra: 5.0, ig: 35, equivalente: '1 Carne magra + 1.5 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo', 'invierno'] },
-  { nombre: 'Tinga de pollo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (200g)', calorias: 220, proteinas: 24.0, carbs: 10.0, grasas: 9.0, fibra: 3.0, ig: 10, equivalente: '1 Carne magra + 1/2 Cereal + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
+  { nombre: 'Sopa  de  fideo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (250g)', calorias: 150, proteinas: 4.0, carbs: 24.0, grasas: 4.0, fibra: 1.5, ig: 45, equivalente: '1 Cereal s/g + 1/2 Grasa', tags: ['tradicional', 'sopa', 'almuerzo'] },
+  { nombre: 'Sopa  de  arroz', categoria: 'Preparados', pais: 'México', porcion: '1 taza (250g)', calorias: 130, proteinas: 3.0, carbs: 22.0, grasas: 3.0, fibra: 0.5, ig: 73, equivalente: '1 Cereal s/g', tags: ['tradicional', 'sopa'] },
+  { nombre: 'Mole  de  olla', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 250, proteinas: 18.0, carbs: 22.0, grasas: 10.0, fibra: 5.0, ig: 35, equivalente: '1 Carne magra + 1.5 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo', 'invierno'] },
+  { nombre: 'Tinga  de  pollo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (200g)', calorias: 220, proteinas: 24.0, carbs: 10.0, grasas: 9.0, fibra: 3.0, ig: 10, equivalente: '1 Carne magra + 1/2 Cereal + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Picadillo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (200g)', calorias: 280, proteinas: 22.0, carbs: 12.0, grasas: 16.0, fibra: 4.0, ig: 25, equivalente: '1 Carne magra + 1 Grasa + 1 Verdura', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Carne en su jugo', categoria: 'Preparados', pais: 'México', porcion: '1 taza (300g)', calorias: 320, proteinas: 26.0, carbs: 14.0, grasas: 18.0, fibra: 3.0, ig: 10, equivalente: '1 Carne semigrasa + 1 Grasa + 1 Verdura', tags: ['tradicional', 'almuerzo', 'cena'] },
   { nombre: 'Cochinita pibil', categoria: 'Preparados', pais: 'México', porcion: '1 taza (200g)', calorias: 320, proteinas: 24.0, carbs: 8.0, grasas: 22.0, fibra: 1.0, ig: 5, equivalente: '1 Carne semigrasa + 2 Grasas', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Pescado a la veracruzana', categoria: 'Preparados', pais: 'México', porcion: '1 filete (150g)', calorias: 220, proteinas: 24.0, carbs: 10.0, grasas: 9.0, fibra: 3.0, ig: 15, equivalente: '1 Carne magra + 1 Grasa + 1 Verdura', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Pescado empanizado', categoria: 'Preparados', pais: 'México', porcion: '1 filete (120g)', calorias: 280, proteinas: 18.0, carbs: 18.0, grasas: 14.0, fibra: 1.0, ig: 55, equivalente: '1 Carne magra + 1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
   { nombre: 'Chiles en nogada', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (200g)', calorias: 350, proteinas: 14.0, carbs: 20.0, grasas: 22.0, fibra: 5.0, ig: 15, equivalente: '1 Carne magra + 2 Grasas + 1 Verdura', tags: ['tradicional', 'temporada'] },
-  { nombre: 'Tacos de carnitas (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 420, proteinas: 24.0, carbs: 32.0, grasas: 22.0, fibra: 4.0, ig: 55, equivalente: '1.5 Carnes semigrasas + 2 Cereales s/g + 2 Grasas', tags: ['tradicional', 'cena'] },
-  { nombre: 'Gordita de chicharron', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 260, proteinas: 8.0, carbs: 30.0, grasas: 12.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 2 Cereales c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
-  { nombre: 'Sope de pollo', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 220, proteinas: 10.0, carbs: 24.0, grasas: 9.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
-  { nombre: 'Huarache de bistec', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (150g)', calorias: 320, proteinas: 18.0, carbs: 38.0, grasas: 12.0, fibra: 6.0, ig: 55, equivalente: '1 Carne magra + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
-  { nombre: 'Quesadilla de flor de calabaza', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 200, proteinas: 8.0, carbs: 22.0, grasas: 9.0, fibra: 3.0, ig: 55, equivalente: '1/2 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'vegetariano'] },
-  { nombre: 'Quesadilla de hongos', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 190, proteinas: 7.0, carbs: 20.0, grasas: 9.0, fibra: 3.0, ig: 55, equivalente: '1/2 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'vegetariano'] },
-  { nombre: 'Flauta de pollo', categoria: 'Preparados', pais: 'México', porcion: '2 piezas (100g)', calorias: 240, proteinas: 12.0, carbs: 22.0, grasas: 12.0, fibra: 2.0, ig: 55, equivalente: '1 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'cena'] },
-  { nombre: 'Tostada de tinga', categoria: 'Preparados', pais: 'México', porcion: '2 piezas (120g)', calorias: 220, proteinas: 14.0, carbs: 22.0, grasas: 10.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Tacos  de  carnitas (3 piezas)', categoria: 'Preparados', pais: 'México', porcion: '3 piezas (180g)', calorias: 420, proteinas: 24.0, carbs: 32.0, grasas: 22.0, fibra: 4.0, ig: 55, equivalente: '1.5 Carnes semigrasas + 2 Cereales s/g + 2 Grasas', tags: ['tradicional', 'cena'] },
+  { nombre: 'Gordita  de  chicharron', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 260, proteinas: 8.0, carbs: 30.0, grasas: 12.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 2 Cereales c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Sope  de  pollo', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (100g)', calorias: 220, proteinas: 10.0, carbs: 24.0, grasas: 9.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
+  { nombre: 'Huarache  de  bistec', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (150g)', calorias: 320, proteinas: 18.0, carbs: 38.0, grasas: 12.0, fibra: 6.0, ig: 55, equivalente: '1 Carne magra + 2 Cereales s/g + 1 Grasa', tags: ['tradicional', 'almuerzo'] },
+  { nombre: 'Quesadilla  de  flor  de  calabaza', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 200, proteinas: 8.0, carbs: 22.0, grasas: 9.0, fibra: 3.0, ig: 55, equivalente: '1/2 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'vegetariano'] },
+  { nombre: 'Quesadilla  de  hongos', categoria: 'Preparados', pais: 'México', porcion: '1 pieza (80g)', calorias: 190, proteinas: 7.0, carbs: 20.0, grasas: 9.0, fibra: 3.0, ig: 55, equivalente: '1/2 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'vegetariano'] },
+  { nombre: 'Flauta  de  pollo', categoria: 'Preparados', pais: 'México', porcion: '2 piezas (100g)', calorias: 240, proteinas: 12.0, carbs: 22.0, grasas: 12.0, fibra: 2.0, ig: 55, equivalente: '1 Carne magra + 1.5 Cereales c/g + 1 Grasa', tags: ['tradicional', 'cena'] },
+  { nombre: 'Tostada  de  tinga', categoria: 'Preparados', pais: 'México', porcion: '2 piezas (120g)', calorias: 220, proteinas: 14.0, carbs: 22.0, grasas: 10.0, fibra: 4.0, ig: 55, equivalente: '1 Carne magra + 1 Cereal c/g + 1 Grasa', tags: ['tradicional', 'colacion'] },
 ];
 
 const PAIS_COLORS: Record<string, string> = {
@@ -429,8 +430,91 @@ const CATEGORIA_COLORS: Record<string, string> = {
 };
 
 const ITEMS_PER_PAGE = 24;
+const T_ALIMENTOS: Record<string, Record<string, string>> = {
+  es: {
+    titulo: 'Alimentos LATAM',
+    buscarPlaceholder: 'Buscar alimento, categoría, tag o equivalente...',
+    todosPaises: 'Todos los países',
+    todasCategorias: 'Todas las categorías',
+    caloriasAbbr: 'cal',
+    proteinaAbbr: 'prot',
+    carbsAbbr: 'carbs',
+    grasaAbbr: 'gras',
+    fibraAbbr: 'fibra',
+    igLabel: 'IG',
+    anterior: 'Anterior',
+    siguiente: 'Siguiente',
+    pagina: 'Página',
+    de: 'de',
+    noResultados: 'No se encontraron alimentos',
+    intentaOtra: 'Intenta con otra búsqueda o filtros diferentes',
+    mostrando: 'Mostrando',
+    alimentos: 'alimentos',
+    categoria: 'Categoría',
+    pais: 'País',
+    porcion: 'Porción',
+    calorias: 'Calorías',
+    proteinas: 'Proteínas',
+    carbs: 'Carbs',
+    grasas: 'Grasas',
+    fibra: 'Fibra',
+    equivalente: 'Equivalente',
+  },
+  en: {
+    titulo: 'LATAM Foods',
+    buscarPlaceholder: 'Search food, category, tag or equivalent...',
+    todosPaises: 'All countries',
+    todasCategorias: 'All categories',
+    caloriasAbbr: 'cal',
+    proteinaAbbr: 'prot',
+    carbsAbbr: 'carbs',
+    grasaAbbr: 'fat',
+    fibraAbbr: 'fiber',
+    igLabel: 'GI',
+    anterior: 'Previous',
+    siguiente: 'Next',
+    pagina: 'Page',
+    de: 'of',
+    noResultados: 'No foods found',
+    intentaOtra: 'Try a different search or filters',
+    mostrando: 'Showing',
+    alimentos: 'foods',
+    categoria: 'Category',
+    pais: 'Country',
+    porcion: 'Portion',
+    calorias: 'Calories',
+    proteinas: 'Protein',
+    carbs: 'Carbs',
+    grasas: 'Fat',
+    fibra: 'Fiber',
+    equivalente: 'Equivalent',
+  },
+};
+
+const T_CATEGORIAS: Record<string, Record<string, string>> = {
+  es: { 'Verduras': 'Verduras', 'Frutas': 'Frutas', 'Cereales': 'Cereales', 'Leguminosas': 'Leguminosas', 'Proteinas': 'Proteínas', 'Lacteos': 'Lácteos', 'Grasas': 'Grasas', 'Bebidas': 'Bebidas', 'Dulces': 'Dulces', 'Condimentos': 'Condimentos', 'Snacks': 'Snacks', 'Preparados': 'Preparados' },
+  en: { 'Verduras': 'Vegetables', 'Frutas': 'Fruits', 'Cereales': 'Grains', 'Leguminosas': 'Legumes', 'Proteinas': 'Proteins', 'Lacteos': 'Dairy', 'Grasas': 'Fats', 'Bebidas': 'Beverages', 'Dulces': 'Sweets', 'Condimentos': 'Condiments', 'Snacks': 'Snacks', 'Preparados': 'Prepared Foods' },
+};
+
+const T_PAISES: Record<string, Record<string, string>> = {
+  es: { 'México': 'México', 'Colombia': 'Colombia', 'Perú': 'Perú', 'Argentina': 'Argentina', 'Brasil': 'Brasil', 'Chile': 'Chile', 'Venezuela': 'Venezuela', 'España': 'España', 'Mediterráneo': 'Mediterráneo', 'Centroamérica': 'Centroamérica', 'Cuba': 'Cuba', 'Yucatán': 'Yucatán', 'Andes': 'Andes', 'Tailandia': 'Tailandia', 'Indonesia': 'Indonesia', 'India': 'India', 'Egipto': 'Egipto' },
+  en: { 'México': 'Mexico', 'Colombia': 'Colombia', 'Perú': 'Peru', 'Argentina': 'Argentina', 'Brasil': 'Brazil', 'Chile': 'Chile', 'Venezuela': 'Venezuela', 'España': 'Spain', 'Mediterráneo': 'Mediterranean', 'Centroamérica': 'Central America', 'Cuba': 'Cuba', 'Yucatán': 'Yucatan', 'Andes': 'Andes', 'Tailandia': 'Thailand', 'Indonesia': 'Indonesia', 'India': 'India', 'Egipto': 'Egypt' },
+};
+
+const T_TAGS: Record<string, Record<string, string>> = {
+  es: { 'basico': 'básico', 'superfood': 'superfood', 'gluten-free': 'sin gluten', 'keto': 'keto', 'pre-entreno': 'pre-entreno', 'post-entreno': 'post-entreno', 'colacion': 'colación', 'tradicional': 'tradicional', 'vegetariano': 'vegetariano', 'vegano': 'vegano', 'temporada': 'temporada', 'aromatica': 'aromática', 'digestivo': 'digestivo', 'hidratacion': 'hidratación', 'invierno': 'invierno', 'sopa': 'sopa', 'desayuno': 'desayuno', 'almuerzo': 'almuerzo', 'cena': 'cena', 'postre': 'postre' },
+  en: { 'basico': 'basic', 'superfood': 'superfood', 'gluten-free': 'gluten-free', 'keto': 'keto', 'pre-entreno': 'pre-workout', 'post-entreno': 'post-workout', 'colacion': 'snack', 'tradicional': 'traditional', 'vegetariano': 'vegetarian', 'vegano': 'vegan', 'temporada': 'seasonal', 'aromatica': 'aromatic', 'digestivo': 'digestive', 'hidratacion': 'hydration', 'invierno': 'winter', 'sopa': 'soup', 'desayuno': 'breakfast', 'almuerzo': 'lunch', 'cena': 'dinner', 'postre': 'dessert' },
+};
+
 
 export function AlimentosLATAM() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language.startsWith('en') ? 'en' : 'es';
+  const t = (key: string) => T_ALIMENTOS[lang][key] || key;
+  const tc = (cat: string) => T_CATEGORIAS[lang][cat] || cat;
+  const tp = (pais: string) => T_PAISES[lang][pais] || pais;
+  const tt = (tag: string) => T_TAGS[lang][tag] || tag;
+
   const [busqueda, setBusqueda] = useState('');
   const [paisFiltro, setPaisFiltro] = useState('todos');
   const [categoriaFiltro, setCategoriaFiltro] = useState('todas');
@@ -466,11 +550,11 @@ export function AlimentosLATAM() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-xl font-bold text-[#f0f0f5]">Alimentos LATAM</h2>
-          <p className="text-xs text-[#8a8d9e]">Base de datos regional con sistema de equivalentes mexicano e indice glicemico</p>
+          <p className="text-xs text-[#8a8d9e]">Base {t('de')} datos regional con sistema {t('de')} equivalentes mexicano e indice glicemico</p>
         </div>
         <div className="flex gap-2">
           <Badge className="bg-[#D4FF00]/10 text-[#D4FF00] border-[#D4FF00]/20">
-            <BookOpen className="w-3 h-3 mr-1"/>{stats.total} alimentos
+            <BookOpen className="w-3 h-3 mr-1"/>{stats.total} {t('alimentos')}
           </Badge>
           <Badge className="bg-[#6366f1]/10 text-[#6366f1] border-[#6366f1]/20">
             {stats.paises} paises
@@ -525,7 +609,7 @@ export function AlimentosLATAM() {
       </div>
 
       <div className="text-xs text-[#55576b]">
-        Mostrando {filtrados.length > 0 ? inicio + 1 : 0}-{Math.min(inicio + ITEMS_PER_PAGE, filtrados.length)} de {filtrados.length} resultados
+        {t('mostrando')} {filtrados.length > 0 ? inicio + 1 : 0}-{Math.min(inicio + ITEMS_PER_PAGE, filtrados.length)} {t('de')} {filtrados.length} resultados
         {busqueda && ` para "${busqueda}"`}
       </div>
 
@@ -538,10 +622,10 @@ export function AlimentosLATAM() {
                   <h3 className="text-sm font-semibold text-[#f0f0f5] truncate">{a.nombre}</h3>
                   <div className="flex items-center gap-1 mt-0.5">
                     <Badge className={`text-[9px] px-1.5 py-0 ${PAIS_COLORS[a.pais] || 'bg-[#55576b]/10 text-[#8a8d9e]'}`}>
-                      <MapPin className="w-2 h-2 mr-0.5" />{a.pais}
+                      <MapPin className="w-2 h-2 mr-0.5" />{tp(a.pais)}
                     </Badge>
                     <Badge className={`text-[9px] px-1.5 py-0 ${CATEGORIA_COLORS[a.categoria] || ''}`}>
-                      {CATEGORIA_EMOJI[a.categoria]} {a.categoria}
+                      {CATEGORIA_EMOJI[a.categoria]} {tc(a.categoria)}
                     </Badge>
                   </div>
                 </div>
@@ -558,7 +642,7 @@ export function AlimentosLATAM() {
                 <div className="bg-[#0a0b0f] rounded p-1">
                   <Beef className="w-3 h-3 text-[#ef4444] mx-auto mb-0.5" />
                   <p className="text-[10px] font-bold text-[#f0f0f5]">{a.proteinas}g</p>
-                  <p className="text-[8px] text-[#55576b]">prot</p>
+                  <p className="text-[8px] text-[#55576b]">{t('proteinaAbbr')}</p>
                 </div>
                 <div className="bg-[#0a0b0f] rounded p-1">
                   <Wheat className="w-3 h-3 text-[#22c55e] mx-auto mb-0.5" />
@@ -568,19 +652,19 @@ export function AlimentosLATAM() {
                 <div className="bg-[#0a0b0f] rounded p-1">
                   <Droplets className="w-3 h-3 text-[#6366f1] mx-auto mb-0.5" />
                   <p className="text-[10px] font-bold text-[#f0f0f5]">{a.grasas}g</p>
-                  <p className="text-[8px] text-[#55576b]">gras</p>
+                  <p className="text-[8px] text-[#55576b]">{t('grasaAbbr')}</p>
                 </div>
                 <div className="bg-[#0a0b0f] rounded p-1">
                   <Wind className="w-3 h-3 text-[#06b6d4] mx-auto mb-0.5" />
                   <p className="text-[10px] font-bold text-[#f0f0f5]">{a.fibra}g</p>
-                  <p className="text-[8px] text-[#55576b]">fibra</p>
+                  <p className="text-[8px] text-[#55576b]">{t('fibraAbbr')}</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1">
                   <Leaf className="w-3 h-3 text-[#8a8d9e]" />
-                  <span className="text-[9px] text-[#8a8d9e]">IG: 
+                  <span className="text-[9px] text-[#8a8d9e]">{t('igLabel')}: 
                     <span className={`font-bold ${a.ig <= 55 ? 'text-green-400' : a.ig <= 70 ? 'text-yellow-400' : 'text-red-400'}`}>
                       {a.ig}
                     </span>
@@ -595,7 +679,7 @@ export function AlimentosLATAM() {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {a.tags.map((tag, ti) => (
                     <span key={ti} className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#1e1f2e] text-[#55576b] capitalize">
-                      {tag}
+                      {tt(tag)}
                     </span>
                   ))}
                 </div>
@@ -614,10 +698,10 @@ export function AlimentosLATAM() {
             disabled={paginaActual <= 1}
             className="border-[#1e1f2e] text-[#f0f0f5] disabled:opacity-30"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
+            <ChevronLeft className="w-4 h-4 mr-1" />{t('anterior')}
           </Button>
           <span className="text-xs text-[#8a8d9e]">
-            Pagina {paginaActual} de {totalPaginas}
+            Pagina {paginaActual} {t('de')} {totalPaginas}
           </span>
           <Button
             variant="outline"
@@ -626,7 +710,7 @@ export function AlimentosLATAM() {
             disabled={paginaActual >= totalPaginas}
             className="border-[#1e1f2e] text-[#f0f0f5] disabled:opacity-30"
           >
-            Siguiente <ChevronRight className="w-4 h-4 ml-1" />
+            {t('siguiente')} <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       )}
@@ -634,8 +718,8 @@ export function AlimentosLATAM() {
       {filtrados.length === 0 && (
         <Card className="p-8 text-center bg-[#11121a] border-[#1e1f2e]">
           <Search className="w-10 h-10 text-[#55576b] mx-auto mb-3" />
-          <p className="text-sm text-[#8a8d9e] mb-1">No se encontraron alimentos</p>
-          <p className="text-xs text-[#55576b]">Intenta con otra busqueda o filtros diferentes</p>
+          <p className="text-sm text-[#8a8d9e] mb-1">{t('noResultados')}</p>
+          <p className="text-xs text-[#55576b]">{t('intentaOtra')}</p>
         </Card>
       )}
     </div>
