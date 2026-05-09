@@ -14,24 +14,28 @@ import { eq } from "drizzle-orm";
 
 const app = new Hono<{ Bindings: HttpBindings }>();
 
-// CORS - permitir frontend en Netlify y Kimi
-app.use(cors({
-  origin: [
-    "https://anthroscope.pro",
-    "https://www.anthroscope.pro",
-    "https://3aa5owlpngtai.kimi.page",
-    "http://localhost:5173",
-    "http://localhost:4173",
-  ],
-  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowHeaders: ["Content-Type", "Authorization"],
+// CORS - permitir conexiones desde CUALQUIER origen (Netlify, localhost, etc.)
+app.use("*", cors({
+  origin: (origin) => origin || "*",
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowHeaders: ["Content-Type", "Authorization", "x-trpc-source"],
   credentials: true,
+  maxAge: 86400,
 }));
 
-// Healthcheck endpoint - Railway pings this to verify the service is alive
+// Log todas las peticiones para debugging
+app.use("*", async (c, next) => {
+  const start = Date.now();
+  console.log(`[${new Date().toISOString()}] ${c.req.method} ${c.req.url} | Origin: ${c.req.header("origin") || "none"}`);
+  await next();
+  const duration = Date.now() - start;
+  console.log(`[${new Date().toISOString()}] ${c.req.method} ${c.req.url} | Status: ${c.res.status} | ${duration}ms`);
+});
+
+// Healthcheck endpoint
 app.get("/api/ping", (c) => c.json({ ok: true, ts: Date.now() }));
 
-// Auto-sync database on startup (delayed so server starts first)
+// Auto-sync database on startup
 setTimeout(async () => {
   try {
     const { execSync } = await import('child_process');
@@ -48,7 +52,7 @@ setTimeout(async () => {
 app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 }));
 app.get(Paths.oauthCallback, createOAuthCallbackHandler());
 
-// Stripe webhook endpoint - HTTP directo (Stripe no usa tRPC)
+// Stripe webhook endpoint
 app.post("/api/webhooks/stripe", async (c) => {
   try {
     const body = await c.req.json();
@@ -117,6 +121,7 @@ app.use("/api/trpc/*", async (c) => {
     createContext,
   });
 });
+
 app.all("/api/*", (c) => c.json({ error: "Not Found" }, 404));
 
 export default app;
