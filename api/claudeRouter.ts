@@ -6,26 +6,34 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "",
 });
 
-async function callClaude(systemPrompt: string, userMessage: string) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return { error: "Claude API key no configurada. Contacta al administrador.", content: null };
+const CLAUDE_MODEL = "claude-sonnet-4-20250514";
+
+async function callClaude(systemPrompt: string, userMessage: string): Promise<{ answer: string | null; error: string | null }> {
+  if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.length < 10) {
+    return { 
+      error: "ANTHROPIC_API_KEY no configurada en el servidor. Ve a Render.com > Environment Variables y agrega tu API key de Anthropic.", 
+      answer: null 
+    };
   }
+  
   try {
+    console.log("[Claude] Calling model:", CLAUDE_MODEL, "| Message length:", userMessage.length);
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: CLAUDE_MODEL,
       max_tokens: 4000,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
     });
     const content = response.content[0];
-    return { content: content.type === "text" ? content.text : "", error: null };
+    const text = content.type === "text" ? content.text : "";
+    console.log("[Claude] Response length:", text.length);
+    return { answer: text, error: null };
   } catch (err: any) {
-    console.error("Claude API error:", err);
-    return { error: err.message || "Error de Claude API", content: null };
+    console.error("[Claude API error]", err);
+    return { error: err.message || "Error de Claude API", answer: null };
   }
 }
 
-// System prompt para planes nutricionales
 const NUTRITION_SYSTEM_PROMPT = `Eres un nutriologo deportivo certificado con 20 anos de experiencia. Especialista en antropometria ISAK, periodizacion nutricional y nutricion del deporte.
 
 REGLAS ESTRICTAS:
@@ -49,7 +57,7 @@ ESTRUCTURA DEL PLAN:
 IDIOMA: Responde en el idioma del usuario.`;
 
 export const claudeRouter = createRouter({
-  generateNutritionPlan: authedQuery
+  generateNutritionPlan: publicQuery
     .input(
       z.object({
         name: z.string().optional(),
@@ -86,18 +94,22 @@ Genera un plan nutricional completo y personalizado con los siguientes datos:
 
 Genera un plan completo con calculos detallados de requerimientos energeticos usando las ecuaciones de Harris-Benedict o Mifflin-St Jeor modificadas para atletas (ACSM 2022). Incluye distribucion de macronutrientes segun el objetivo y deporte.`;
 
+      console.log("[generateNutritionPlan] Generando plan para:", input.name || "Sin nombre");
       return callClaude(NUTRITION_SYSTEM_PROMPT, prompt);
     }),
 
-  askNutritionQuestion: authedQuery
+  askNutritionQuestion: publicQuery
     .input(
       z.object({
         question: z.string().min(3).max(2000),
         context: z.string().optional(),
         language: z.enum(["es", "en"]).default("es"),
+        lang: z.enum(["es", "en"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
+      const idioma = input.lang || input.language || "es";
+      
       const systemPrompt = `Eres un nutriologo deportivo experto certificado. Responde basandote en evidencia cientifica (ACSM, ISSN, IOC, ISAK).
 
 REGLAS:
@@ -106,16 +118,24 @@ REGLAS:
 3. Incluye valores numericos especificos cuando sea posible
 4. Si no estas seguro, di "No tengo evidencia suficiente para responder con certeza"
 5. NUNCA recomiendes algo peligroso para la salud
-6. Idioma: ${input.language === "es" ? "Espanol" : "English"}`;
+6. Idioma: ${idioma === "es" ? "Espanol" : "English"}`;
 
       const prompt = input.context
         ? `Contexto del paciente: ${input.context}\n\nPregunta: ${input.question}`
         : input.question;
 
-      return callClaude(systemPrompt, prompt);
+      console.log("[askNutritionQuestion] Pregunta:", input.question.substring(0, 50), "| Idioma:", idioma);
+      
+      const result = await callClaude(systemPrompt, prompt);
+      
+      if (result.error) {
+        console.error("[askNutritionQuestion] Error:", result.error);
+      }
+      
+      return result;
     }),
 
-  analyzeMeal: authedQuery
+  analyzeMeal: publicQuery
     .input(
       z.object({
         mealDescription: z.string().min(10).max(2000),
@@ -133,6 +153,7 @@ REGLAS:
 
 Idioma: ${input.language === "es" ? "Espanol" : "English"}`;
 
+      console.log("[analyzeMeal] Analizando comida:", input.mealDescription.substring(0, 40));
       return callClaude(
         systemPrompt,
         `Analiza esta comida: "${input.mealDescription}"\nObjetivo del paciente: ${input.goal || "No especificado"}`
