@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || "",
 });
 
-const CLAUDE_MODEL = "claude-3-sonnet-20240229";
+const CLAUDE_MODEL = "claude-3-haiku-20240307";
 
 async function callClaude(systemPrompt: string, userMessage: string): Promise<{ answer: string | null; error: string | null }> {
   if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.length < 10) {
