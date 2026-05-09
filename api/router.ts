@@ -2,9 +2,9 @@ import { authRouter } from "./auth-router";
 import { subscriptionRouter } from "./subscription-router";
 import { stripeWebhookRouter } from "./stripe-webhook";
 import { evaluacionesRouter } from "./evaluaciones-router";
-import { patientsRouter } from "./patients-router";
 import { claudeRouter } from "./claudeRouter";
 import { emailRouter } from "./emailRouter";
+import { checkinRouter } from "./checkinRouter";
 import { createRouter, publicQuery } from "./middleware";
 
 export const appRouter = createRouter({
@@ -13,9 +13,9 @@ export const appRouter = createRouter({
   subscription: subscriptionRouter,
   stripe: stripeWebhookRouter,
   evaluaciones: evaluacionesRouter,
-  patients: patientsRouter,
   claude: claudeRouter,
   email: emailRouter,
+  checkin: checkinRouter,
 });
 
 export type AppRouter = typeof appRouter;
