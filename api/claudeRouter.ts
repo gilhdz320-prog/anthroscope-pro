@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRouter, publicQuery, authedQuery } from "./middleware";
+import { createRouter, publicQuery } from "./middleware";
 import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
@@ -11,13 +11,12 @@ const CLAUDE_MODEL = "claude-sonnet-4-20250514";
 async function callClaude(systemPrompt: string, userMessage: string): Promise<{ answer: string | null; error: string | null }> {
   if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY.length < 10) {
     return { 
-      error: "ANTHROPIC_API_KEY no configurada en el servidor. Ve a Render.com > Environment Variables y agrega tu API key de Anthropic.", 
+      error: "ANTHROPIC_API_KEY no configurada. Ve a Render > Environment Variables.", 
       answer: null 
     };
   }
   
   try {
-    console.log("[Claude] Calling model:", CLAUDE_MODEL, "| Message length:", userMessage.length);
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: 4000,
@@ -25,34 +24,21 @@ async function callClaude(systemPrompt: string, userMessage: string): Promise<{ 
       messages: [{ role: "user", content: userMessage }],
     });
     const content = response.content[0];
-    const text = content.type === "text" ? content.text : "";
-    console.log("[Claude] Response length:", text.length);
-    return { answer: text, error: null };
+    return { answer: content.type === "text" ? content.text : "", error: null };
   } catch (err: any) {
-    console.error("[Claude API error]", err);
     return { error: err.message || "Error de Claude API", answer: null };
   }
 }
 
-const NUTRITION_SYSTEM_PROMPT = `Eres un nutriologo deportivo certificado con 20 anos de experiencia. Especialista en antropometria ISAK, periodizacion nutricional y nutricion del deporte.
+const NUTRITION_SYSTEM_PROMPT = `Eres un nutriologo deportivo certificado. Especialista en antropometria ISAK, periodizacion nutricional.
 
-REGLAS ESTRICTAS:
+REGLAS:
 1. SIEMPRE basa tus recomendaciones en evidencia cientifica (ACSM, ISSN, IOC)
 2. Usa el Sistema de Equivalentes Mexicanos para las porciones
 3. Incluye INDICE GLICEMICO de cada alimento recomendado
 4. Personaliza segun: sexo, edad, peso, % grasa, objetivo, deporte
-5. NO recomiendas suplementos sin justificar con evidencia
-6. Incluye hidratacion especifica (sodio, carbs en bebida)
-7. FORMATO: Markdown con tablas claras
-
-ESTRUCTURA DEL PLAN:
-- Datos del paciente analizados
-- Calculo de requerimientos (TMB, GET, proteinas, carbs, grasas)
-- Distribucion de equivalentes por tiempo de comida
-- Menu de ejemplo (Desayuno, Colacion, Comida, Pre-entreno, Post-entreno, Cena)
-- Hidratacion ( antes/durante/despues del entrenamiento)
-- Suplementacion basada en evidencia (solo si aplica)
-- Consideraciones especiales
+5. NO recomiendes suplementos sin justificar con evidencia
+6. FORMATO: Markdown con tablas claras
 
 IDIOMA: Responde en el idioma del usuario.`;
 
@@ -75,8 +61,7 @@ export const claudeRouter = createRouter({
       })
     )
     .mutation(async ({ input }) => {
-      const prompt = `
-Genera un plan nutricional completo y personalizado con los siguientes datos:
+      const prompt = `Genera un plan nutricional completo y personalizado:
 
 **DATOS DEL PACIENTE:**
 - Nombre: ${input.name || "No especificado"}
@@ -87,14 +72,11 @@ Genera un plan nutricional completo y personalizado con los siguientes datos:
 - % Grasa corporal: ${input.bodyFat}%
 - Masa muscular: ${input.muscleMass || "No medida"} kg
 - Deporte: ${input.sport || "No especificado"}
-- Horas de entrenamiento/semana: ${input.trainingHours || "No especificado"}
+- Horas/semana: ${input.trainingHours || "No especificado"}
 - Objetivo: ${input.goal}
-- Restricciones alimentarias: ${input.dietaryRestrictions || "Ninguna"}
-- Idioma: ${input.language === "es" ? "Espanol" : "English"}
+- Restricciones: ${input.dietaryRestrictions || "Ninguna"}
+- Idioma: ${input.language === "es" ? "Espanol" : "English"}`;
 
-Genera un plan completo con calculos detallados de requerimientos energeticos usando las ecuaciones de Harris-Benedict o Mifflin-St Jeor modificadas para atletas (ACSM 2022). Incluye distribucion de macronutrientes segun el objetivo y deporte.`;
-
-      console.log("[generateNutritionPlan] Generando plan para:", input.name || "Sin nombre");
       return callClaude(NUTRITION_SYSTEM_PROMPT, prompt);
     }),
 
@@ -124,15 +106,7 @@ REGLAS:
         ? `Contexto del paciente: ${input.context}\n\nPregunta: ${input.question}`
         : input.question;
 
-      console.log("[askNutritionQuestion] Pregunta:", input.question.substring(0, 50), "| Idioma:", idioma);
-      
-      const result = await callClaude(systemPrompt, prompt);
-      
-      if (result.error) {
-        console.error("[askNutritionQuestion] Error:", result.error);
-      }
-      
-      return result;
+      return callClaude(systemPrompt, prompt);
     }),
 
   analyzeMeal: publicQuery
@@ -153,10 +127,9 @@ REGLAS:
 
 Idioma: ${input.language === "es" ? "Espanol" : "English"}`;
 
-      console.log("[analyzeMeal] Analizando comida:", input.mealDescription.substring(0, 40));
       return callClaude(
         systemPrompt,
-        `Analiza esta comida: "${input.mealDescription}"\nObjetivo del paciente: ${input.goal || "No especificado"}`
+        `Analiza esta comida: "${input.mealDescription}"\nObjetivo: ${input.goal || "No especificado"}`
       );
     }),
 });
